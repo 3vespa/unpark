@@ -8,6 +8,7 @@ using Unpark.Core.Power;
 using Unpark.Core.Registry;
 using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
+using Unpark.Core.Startup;
 
 namespace Unpark.Services;
 
@@ -27,7 +28,8 @@ public sealed class AppServices
         Power = new WindowsPowerApi();
         PowerPlan = new UnparkPowerPlan(Context, Power, Commands);
         Gaming = GamingSettings.Create(Context, new WindowsSystemUiApi());
-        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming], SettingsEngine.SystemLastBootUtc);
+        Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
+        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
         RestorePoints = new RestorePointService(new WmiRestorePointApi(), Registry, Log);
     }
 
@@ -42,6 +44,7 @@ public sealed class AppServices
     public IPowerApi Power { get; }
     public UnparkPowerPlan PowerPlan { get; }
     public IReadOnlyList<ISetting> Gaming { get; }
+    public StartupService Startup { get; }
 
     /// <summary>Prévient les écrans qu'un réglage a changé (bandeau de redémarrage, compteurs…).</summary>
     public event Action? StateChanged;
