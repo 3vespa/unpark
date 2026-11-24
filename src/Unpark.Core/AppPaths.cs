@@ -9,4 +9,5 @@ public sealed class AppPaths(string root)
     public string Root { get; } = root;
     public string BackupFile => Path.Combine(Root, "backup.json");
     public string LogsDir => Path.Combine(Root, "logs");
+    public string DebloatHistoryFile => Path.Combine(Root, "debloat.json");
 }

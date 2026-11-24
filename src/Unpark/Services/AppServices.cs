@@ -3,6 +3,7 @@ using Unpark.Core;
 using Unpark.Core.Backup;
 using Unpark.Core.Cleanup;
 using Unpark.Core.Commands;
+using Unpark.Core.Debloat;
 using Unpark.Core.Gaming;
 using Unpark.Core.Logging;
 using Unpark.Core.Power;
@@ -10,6 +11,7 @@ using Unpark.Core.Registry;
 using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
 using Unpark.Core.Startup;
+using Unpark.Interop;
 
 namespace Unpark.Services;
 
@@ -30,6 +32,7 @@ public sealed class AppServices
         PowerPlan = new UnparkPowerPlan(Context, Power, Commands);
         Gaming = GamingSettings.Create(Context, new WindowsSystemUiApi());
         Cleanup = new CleanupService(new WindowsCleanupSystem(), Log, CleanupPaths.Default);
+        Debloat = new DebloatService(new WindowsAppxApi(), Log, Paths.DebloatHistoryFile);
         Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
         Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
         RestorePoints = new RestorePointService(new WmiRestorePointApi(), Registry, Log);
@@ -48,6 +51,7 @@ public sealed class AppServices
     public IReadOnlyList<ISetting> Gaming { get; }
     public StartupService Startup { get; }
     public CleanupService Cleanup { get; }
+    public DebloatService Debloat { get; }
 
     /// <summary>Prévient les écrans qu'un réglage a changé (bandeau de redémarrage, compteurs…).</summary>
     public event Action? StateChanged;

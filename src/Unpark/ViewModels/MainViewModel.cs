@@ -19,7 +19,7 @@ public sealed partial class MainViewModel : ObservableObject
             new GamingViewModel(),
             new StartupViewModel(),
             new CleanupViewModel(),
-            new PlaceholderViewModel("Debloat", "", "Applis préinstallées à retirer, avec une liste sûre cochée par défaut."),
+            new DebloatViewModel(),
             new PlaceholderViewModel("Infos système", "", "Processeur, carte graphique, mémoire, disques, version de Windows, plan d'alimentation actif."),
         ];
         _selectedPage = Pages[0];
