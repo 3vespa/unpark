@@ -38,6 +38,25 @@ public class DiagnosticParserTests
     }
 
     [Fact]
+    public void Temperature_nvidia_en_secours()
+    {
+        const string q = "==============NVSMI LOG==============\r\n    Temperature\r\n        GPU Current Temp                  : 41 C\r\n        GPU T.Limit Temp                  : N/A";
+        Assert.Equal(41, DiagnosticParsers.ParseNvidiaTemperature(q));
+        Assert.Null(DiagnosticParsers.ParseNvidiaTemperature("GPU Current Temp : N/A"));
+    }
+
+    [Fact]
+    public void Processeur_au_repos_sans_Unpark_ni_WMI()
+    {
+        // Cas réel : 15 % mesurés pendant que le diagnostic interrogeait WMI.
+        var (cpu, top) = DiagnosticParsers.CorrectIdleCpu(15, 2.5,
+            [new("brave", 6), new("WmiPrvSE", 3.5), new("dwm", 2), new("svchost", 1), new("nvidia-smi", 0.4)]);
+        Assert.Equal(8.6, cpu, 1);
+        Assert.Equal(["brave", "dwm", "svchost"], top.Select(p => p.Name));
+        Assert.Equal(0, DiagnosticParsers.CorrectIdleCpu(1, 3, []).Cpu);
+    }
+
+    [Fact]
     public void Bibliotheques_Steam_et_Epic()
     {
         const string vdf = """

@@ -22,6 +22,34 @@ public static partial class DiagnosticParsers
         return new NvidiaData(N(f[0]), N(f[1]), N(f[2]), N(f[3]), N(f[4]), bar1TotalMiB);
     }
 
+    /// <summary>Température dans « nvidia-smi -q -d TEMPERATURE » (« GPU Current Temp : 41 C »), en secours.</summary>
+    public static int? ParseNvidiaTemperature(string output)
+    {
+        var m = TempRegex().Match(output);
+        return m.Success && int.TryParse(m.Groups[1].Value, out var v) ? v : null;
+    }
+
+    [GeneratedRegex(@"GPU Current Temp\s*:\s*(\d+)\s*C", RegexOptions.IgnoreCase)]
+    private static partial Regex TempRegex();
+
+    /// <summary>Programmes lancés par le diagnostic lui-même : leur activité ne compte pas dans « processeur au repos ».</summary>
+    public static readonly string[] DiagnosticHelpers = ["WmiPrvSE", "nvidia-smi", "PING"];
+
+    /// <summary>
+    /// Processeur au repos corrigé : on retire du total ce que consomment Unpark (selfPercent) et les programmes
+    /// lancés par le diagnostic (WMI, nvidia-smi), qui ne sont pas de « l'activité en fond » de l'utilisateur.
+    /// </summary>
+    public static (double Cpu, IReadOnlyList<ProcessUsage> Top) CorrectIdleCpu(double totalPercent, double selfPercent, IReadOnlyList<ProcessUsage> processes)
+    {
+        var helpers = processes.Where(p => DiagnosticHelpers.Contains(p.Name, StringComparer.OrdinalIgnoreCase)).Sum(p => p.Percent);
+        var top = processes
+            .Where(p => !DiagnosticHelpers.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
+            .OrderByDescending(p => p.Percent)
+            .Take(5)
+            .ToList();
+        return (Math.Max(0, totalPercent - selfPercent - helpers), top);
+    }
+
     /// <summary>Taille totale de la zone BAR1 dans « nvidia-smi -q -d MEMORY » (256 Mio = Resizable BAR désactivé).</summary>
     public static long? ParseBar1TotalMiB(string output)
     {

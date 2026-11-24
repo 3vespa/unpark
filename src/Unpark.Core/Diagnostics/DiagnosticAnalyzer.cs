@@ -282,7 +282,7 @@ public static class DiagnosticAnalyzer
         if (w.IdleCpuPercent is { } cpu)
         {
             var top = w.TopProcesses.Where(p => p.Percent >= 1).Take(3).Select(p => $"{p.Name} {p.Percent:0} %").ToList();
-            var value = $"{cpu:0} % en moyenne sur 30 s" + (top.Count > 0 ? $" — {string.Join(", ", top)}" : "");
+            var value = $"{cpu:0} % en moyenne sur 30 s (hors Unpark)" + (top.Count > 0 ? $" — {string.Join(", ", top)}" : "");
             checks.Add(cpu > 25
                 ? new("Processeur au repos", DiagStatus.Red, value, "Le processeur travaille beaucoup alors que rien ne tourne : un programme consomme en fond (voir la liste). Vérifie-le dans le Gestionnaire des tâches.")
                 : cpu > 10

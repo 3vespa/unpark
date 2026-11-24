@@ -31,8 +31,7 @@ public sealed class WindowsDiagnostics(
     public async Task<DiagnosticData> RunAsync(IProgress<string> progress, CancellationToken cancel = default)
     {
         log.Info("Diagnostic : début (lecture seule)");
-        progress.Report("Mesure du processeur au repos (30 s) et du réseau (20 s)…");
-        var cpuTask = Task.Run(() => MeasureIdleCpu(cancel), cancel);
+        // Le réseau se mesure pendant les lectures ; le processeur est mesuré APRÈS, quand Unpark ne lit plus rien.
         var netTask = Task.Run(() => MeasureNetwork(cancel), cancel);
 
         progress.Report("Lecture de la mémoire, de l'écran et de la carte graphique…");
@@ -46,8 +45,8 @@ public sealed class WindowsDiagnostics(
         var games = await Task.Run(() => Safe("bibliothèques de jeux", ReadGameFolders) ?? [], cancel);
         var version = Safe("version de Windows", () => WindowsVersionInfo.Read(registry).ToString()) ?? Environment.OSVersion.VersionString;
 
-        progress.Report("Fin des mesures du processeur et du réseau…");
-        var (cpu, top) = await cpuTask;
+        progress.Report("Mesure du processeur au repos (30 s)… ne touche à rien pendant ce temps.");
+        var (cpu, top) = await Task.Run(() => MeasureIdleCpu(cancel), cancel);
         var network = await netTask;
         var windows = Safe("Windows", () => ReadWindows(cpu, top));
 
@@ -121,6 +120,13 @@ public sealed class WindowsDiagnostics(
             var memory = commands.Run(smi, "-q -d MEMORY");
             if (query.Ok) nvidia = DiagnosticParsers.ParseNvidiaQuery(query.Output, memory.Ok ? DiagnosticParsers.ParseBar1TotalMiB(memory.Output) : null);
             else log.Warn($"Diagnostic : nvidia-smi a échoué ({query.Text})");
+            if (nvidia is { TemperatureC: null })
+            {
+                // Secours : certaines cartes renvoient « [N/A] » dans la requête courte.
+                log.Info($"Diagnostic : température absente de la requête nvidia-smi (« {query.Output} »), seconde méthode");
+                var temp = commands.Run(smi, "-q -d TEMPERATURE");
+                if (temp.Ok) nvidia = nvidia with { TemperatureC = DiagnosticParsers.ParseNvidiaTemperature(temp.Output) };
+            }
         }
 
         return gpus.Select(g =>
@@ -180,6 +186,7 @@ public sealed class WindowsDiagnostics(
                     3 => "HDD (disque dur)",
                     _ => bus == 17 ? "SSD NVMe" : bus == 7 ? "Disque USB" : "Type inconnu",
                 };
+                if (bus == 7 && media is 3 or 4) type += " externe (USB)";
                 var health = Int(o["HealthStatus"]) switch { 0 => "Healthy", 1 => "Warning", 2 => "Unhealthy", _ => "Unknown" };
                 return new DiskData(Str(o["FriendlyName"]), type, health, letters.GetValueOrDefault(Str(o["DeviceId"])) ?? []);
             })
@@ -259,15 +266,17 @@ public sealed class WindowsDiagnostics(
             var cpu = total <= 0 ? 0 : 100.0 * (total - (idle2 - idle1)) / total;
             var capacity = watch.Elapsed.TotalMilliseconds * Environment.ProcessorCount;
             var self = Environment.ProcessId;
-            var top = after
+            double Percent(int id) => after.TryGetValue(id, out var a) && before.TryGetValue(id, out var b)
+                ? 100.0 * (a.Cpu - b.Cpu).TotalMilliseconds / capacity : 0;
+            var processes = after
                 .Where(p => p.Key != 0 && p.Key != self && before.ContainsKey(p.Key))
-                .Select(p => new ProcessUsage(p.Value.Name, 100.0 * (p.Value.Cpu - before[p.Key].Cpu).TotalMilliseconds / capacity))
+                .Select(p => new ProcessUsage(p.Value.Name, Percent(p.Key)))
                 .GroupBy(p => p.Name)
                 .Select(g => new ProcessUsage(g.Key, g.Sum(p => p.Percent)))
-                .OrderByDescending(p => p.Percent)
-                .Take(5)
                 .ToList();
-            return (cpu, top);
+            var corrected = DiagnosticParsers.CorrectIdleCpu(cpu, Percent(self), processes);
+            log.Info($"Diagnostic : processeur {cpu:0.#} % mesuré, {corrected.Cpu:0.#} % hors Unpark et outils du diagnostic");
+            return (corrected.Cpu, corrected.Top);
         }
         catch (Exception e)
         {
