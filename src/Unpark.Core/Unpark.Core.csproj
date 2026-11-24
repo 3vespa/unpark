@@ -13,6 +13,8 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
     <!-- Arrêt/relance propre de Windows Update pendant le nettoyage. Fonctionne seulement sous Windows. -->
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
+    <!-- Lecture de l'Observateur d'événements (diagnostic : WHEA, écrans bleus, Kernel-Power 41). -->
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Unpark.Tests" />

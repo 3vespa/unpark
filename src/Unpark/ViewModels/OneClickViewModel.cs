@@ -15,7 +15,7 @@ public sealed partial class OneClickItemViewModel : ObservableObject
     public OneClickItemViewModel(ISetting setting, bool defaultChecked, string? note)
     {
         Setting = setting;
-        Note = note;
+        _note = note;
         _isChecked = defaultChecked;
         Refresh();
     }
@@ -23,7 +23,7 @@ public sealed partial class OneClickItemViewModel : ObservableObject
     public ISetting Setting { get; }
     public string Name => Setting.Name;
     public string Description => Setting.Description;
-    public string? Note { get; }
+    [ObservableProperty] private string? _note;
     public bool RequiresRestart => Setting.RequiresRestart;
 
     [ObservableProperty] private bool _isChecked;
@@ -50,12 +50,21 @@ public sealed partial class OneClickViewModel : PageViewModel
     {
         Items.Add(new OneClickItemViewModel(S.PowerPlan, true, null));
         foreach (var s in S.Gaming)
-            Items.Add(new OneClickItemViewModel(s, s.Id != GamingSettings.VisualFxId,
-                s.Id == GamingSettings.VisualFxId ? "Optionnel : coche-le si ton PC est modeste." :
-                s.Id == GamingSettings.HagsId ? "Non garanti sur ce PC (carte et pilote compatibles nécessaires)." : null));
+            // HAGS : jamais coché d'office ; coché seulement si la carte est une RTX 40/50 (voir LoadHagsAdviceAsync).
+            Items.Add(new OneClickItemViewModel(s, s.Id != GamingSettings.VisualFxId && s.Id != GamingSettings.HagsId,
+                s.Id == GamingSettings.VisualFxId ? "Optionnel : coche-le si ton PC est modeste." : null));
         S.StateChanged += Refresh;
         Refresh();
         _ = DetectLaptopAsync();
+        _ = LoadHagsAdviceAsync();
+    }
+
+    private async Task LoadHagsAdviceAsync()
+    {
+        var advice = await S.HagsAdviceAsync();
+        var hags = Items.Single(i => i.Setting.Id == GamingSettings.HagsId);
+        hags.Note = advice.Note;
+        hags.IsChecked = advice.Recommended;
     }
 
     public ObservableCollection<OneClickItemViewModel> Items { get; } = [];

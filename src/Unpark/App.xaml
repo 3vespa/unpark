@@ -32,6 +32,9 @@
             <DataTemplate DataType="{x:Type vm:InfoViewModel}">
                 <v:InfoView />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DiagnosticViewModel}">
+                <v:DiagnosticView />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:OneClickViewModel}">
                 <v:OneClickView />
             </DataTemplate>

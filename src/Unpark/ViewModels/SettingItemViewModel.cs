@@ -18,7 +18,7 @@ public sealed partial class SettingItemViewModel : ObservableObject
     public SettingItemViewModel(ISetting setting, string? note = null)
     {
         Setting = setting;
-        Note = note;
+        _note = note;
         Refresh();
     }
 
@@ -26,8 +26,8 @@ public sealed partial class SettingItemViewModel : ObservableObject
     public string Name => Setting.Name;
     public string Description => Setting.Description;
     public bool RequiresRestart => Setting.RequiresRestart;
-    /// <summary>Remarque affichée en orange (ex. « Non garanti sur ce PC »).</summary>
-    public string? Note { get; }
+    /// <summary>Remarque affichée en orange (ex. conseil HAGS selon la carte graphique).</summary>
+    [ObservableProperty] private string? _note;
 
     public ObservableCollection<PreviewRow> Preview { get; } = [];
     public bool HasPreview => Setting is VisualEffectsSetting;

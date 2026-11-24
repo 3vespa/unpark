@@ -4,7 +4,7 @@
              xmlns:v="clr-namespace:Unpark.Views">
     <StackPanel>
         <DockPanel>
-            <Button DockPanel.Dock="Right" Content="Tout appliquer (sauf effets visuels)" Style="{StaticResource AccentButton}"
+            <Button DockPanel.Dock="Right" Content="Tout appliquer (recommandés)" Style="{StaticResource AccentButton}"
                     Command="{Binding ApplyAllCommand}" VerticalAlignment="Center" />
             <TextBlock Text="Gaming" Style="{StaticResource TitleText}" />
         </DockPanel>

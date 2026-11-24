@@ -14,6 +14,7 @@ public sealed partial class MainViewModel : ObservableObject
         Pages =
         [
             new HomeViewModel(),
+            new DiagnosticViewModel(),
             new OneClickViewModel(),
             new PowerPlanViewModel(),
             new GamingViewModel(),
@@ -26,6 +27,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         var s = AppServices.Current;
         s.StateChanged += RefreshRestart;
+        s.NavigateRequested += type => SelectedPage = Pages.FirstOrDefault(p => p.GetType() == type) ?? SelectedPage;
         s.BusyChanged += text => System.Windows.Application.Current.Dispatcher.Invoke(() => BusyText = text);
         RefreshRestart();
     }

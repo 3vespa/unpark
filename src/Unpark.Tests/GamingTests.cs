@@ -95,3 +95,19 @@ public class GamingTests : IDisposable
         Assert.Contains(preview, p => p.Effect.SetAction == 0x1043 && p.On);
     }
 }
+
+public class HagsAdviceTests
+{
+    [Fact]
+    public void Recommande_seulement_sur_RTX_40_et_50()
+    {
+        var rtx = HagsAdvice.For(["Intel(R) UHD Graphics 770", "NVIDIA GeForce RTX 4070 Ti"]);
+        Assert.True(rtx.Recommended);
+        Assert.Contains("DLSS Frame Generation", rtx.Note);
+
+        var other = HagsAdvice.For(["NVIDIA GeForce RTX 3060"]);
+        Assert.False(other.Recommended);
+        Assert.Equal(HagsAdvice.NeutralNote, other.Note);
+        Assert.False(HagsAdvice.For([]).Recommended);
+    }
+}

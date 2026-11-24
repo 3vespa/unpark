@@ -155,3 +155,19 @@ public sealed class VisualEffectsSetting(SettingContext ctx, ISystemUiApi ui) : 
         RegistrySetting.RevertFromBackup(ctx, Id, Name); // VisualFXSetting + suppression de la sauvegarde
     }
 }
+
+/// <summary>Conseil HAGS selon la carte graphique (jamais activé automatiquement).</summary>
+public sealed record HagsAdvice(bool Recommended, string Note)
+{
+    public const string NeutralNote =
+        "Effet quasi nul en FPS, utile seulement pour la génération d'images ; peut réserver de la mémoire vidéo sur les cartes de 6-8 Go.";
+
+    /// <summary>RTX 40 ou 50 : recommandé (nécessaire pour DLSS Frame Generation). Autres cartes : laisser tel quel.</summary>
+    public static HagsAdvice For(IEnumerable<string> gpuNames)
+    {
+        var rtx = gpuNames.FirstOrDefault(Unpark.Core.Diagnostics.DiagnosticParsers.IsRtx40Or50);
+        return rtx is not null
+            ? new HagsAdvice(true, $"Recommandé sur ta {rtx} : nécessaire pour DLSS Frame Generation.")
+            : new HagsAdvice(false, NeutralNote);
+    }
+}

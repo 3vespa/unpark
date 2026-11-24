@@ -4,6 +4,7 @@ using Unpark.Core.Backup;
 using Unpark.Core.Cleanup;
 using Unpark.Core.Commands;
 using Unpark.Core.Debloat;
+using Unpark.Core.Diagnostics;
 using Unpark.Core.Gaming;
 using Unpark.Core.Logging;
 using Unpark.Core.Power;
@@ -37,6 +38,12 @@ public sealed class AppServices
         Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
         Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
         SystemInfo = new SystemInfoService(new WmiHardwareInfoApi(), Registry, Power, Startup);
+        Diagnostics = new WindowsDiagnostics(Registry, Power, Startup, Commands, Log);
+        _hags = new Lazy<Task<HagsAdvice>>(() => Task.Run(() =>
+        {
+            try { return HagsAdvice.For(new WmiHardwareInfoApi().Gpus().Select(g => g.Name)); }
+            catch { return HagsAdvice.For([]); }
+        }));
         RestorePoints = new RestorePointService(new WmiRestorePointApi(), Registry, Log);
     }
 
@@ -55,6 +62,15 @@ public sealed class AppServices
     public CleanupService Cleanup { get; }
     public DebloatService Debloat { get; }
     public SystemInfoService SystemInfo { get; }
+    public WindowsDiagnostics Diagnostics { get; }
+
+    private readonly Lazy<Task<HagsAdvice>> _hags;
+    /// <summary>Conseil HAGS selon la carte graphique (lu une seule fois).</summary>
+    public Task<HagsAdvice> HagsAdviceAsync() => _hags.Value;
+
+    /// <summary>Demande d'ouvrir une page de l'appli (ex. bouton « Corriger » du diagnostic).</summary>
+    public event Action<Type>? NavigateRequested;
+    public void Navigate(Type pageViewModel) => NavigateRequested?.Invoke(pageViewModel);
 
     /// <summary>Prévient les écrans qu'un réglage a changé (bandeau de redémarrage, compteurs…).</summary>
     public event Action? StateChanged;
@@ -62,6 +78,15 @@ public sealed class AppServices
 
     /// <summary>Opération longue en cours (texte affiché par-dessus l'appli), null sinon.</summary>
     public event Action<string?>? BusyChanged;
+
+    /// <summary>Opération longue avec un texte d'avancement qui change.</summary>
+    public async Task<T> RunBusyAsync<T>(string text, Func<IProgress<string>, Task<T>> work)
+    {
+        BusyChanged?.Invoke(text);
+        var progress = new Progress<string>(t => BusyChanged?.Invoke(t));
+        try { return await Task.Run(() => work(progress)); }
+        finally { BusyChanged?.Invoke(null); }
+    }
 
     public async Task<T> RunBusyAsync<T>(string text, Func<T> work)
     {
