@@ -14,7 +14,7 @@ public sealed partial class MainViewModel : ObservableObject
         Pages =
         [
             new HomeViewModel(),
-            new PlaceholderViewModel("Gaming en 1 clic", "", "Plan Unpark Performance + réglages Gaming + nettoyage, avec un récapitulatif avant de valider et un bouton « Tout annuler »."),
+            new OneClickViewModel(),
             new PowerPlanViewModel(),
             new GamingViewModel(),
             new StartupViewModel(),

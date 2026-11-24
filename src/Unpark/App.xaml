@@ -32,8 +32,8 @@
             <DataTemplate DataType="{x:Type vm:InfoViewModel}">
                 <v:InfoView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}">
-                <v:PlaceholderView />
+            <DataTemplate DataType="{x:Type vm:OneClickViewModel}">
+                <v:OneClickView />
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
