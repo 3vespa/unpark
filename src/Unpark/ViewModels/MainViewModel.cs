@@ -15,7 +15,7 @@ public sealed partial class MainViewModel : ObservableObject
         [
             new HomeViewModel(),
             new PlaceholderViewModel("Gaming en 1 clic", "", "Plan Unpark Performance + réglages Gaming + nettoyage, avec un récapitulatif avant de valider et un bouton « Tout annuler »."),
-            new PlaceholderViewModel("Plan d'alimentation", "", "Plan « Unpark Performance » : cœurs toujours actifs, processeur à 100 %, boost agressif. Retour à ton ancien plan en un clic."),
+            new PowerPlanViewModel(),
             new PlaceholderViewModel("Gaming", "", "Mode Jeu, planification GPU (HAGS), captures Game DVR, accélération de la souris, effets visuels."),
             new PlaceholderViewModel("Démarrage", "", "Programmes lancés au démarrage de Windows, à activer ou désactiver comme dans le Gestionnaire des tâches."),
             new PlaceholderViewModel("Nettoyage", "", "Fichiers temporaires, cache de Windows Update, corbeille, miniatures. Espace récupérable affiché avant."),

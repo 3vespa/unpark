@@ -10,7 +10,7 @@ public class RestorePointTests
     private readonly MemoryLog _log = new();
     private static readonly DateTime Now = new(2026, 11, 24, 12, 0, 0, DateTimeKind.Utc);
 
-    private RestorePointService Service() => new(_api, _reg, _log, () => Now);
+    private RestorePointService Service() => new(_api, _reg, _log, () => Now, _ => { });
 
     [Fact]
     public void Cree_et_verifie_en_relisant_la_liste()
@@ -66,5 +66,28 @@ public class RestorePointTests
         _api.Latest = Now.AddMinutes(-10);
         _api.OnCreate = () => Now;
         Assert.Equal(RestorePointOutcome.Created, Service().Create("x", forceIfRecent: false).Outcome);
+    }
+
+    [Fact]
+    public void WMI_en_echec_la_methode_de_secours_prend_le_relais()
+    {
+        _api.Latest = Now.AddDays(-3);
+        _api.WmiThrows = new InvalidOperationException("Type incompatible");
+        _api.OnCreate = () => Now;
+        var r = Service().Create("Avant Unpark", forceIfRecent: false);
+        Assert.Equal(RestorePointOutcome.Created, r.Outcome);
+        Assert.Equal(1, _api.FallbackCalls);
+    }
+
+    [Fact]
+    public void Les_deux_methodes_en_echec_donnent_le_detail_technique()
+    {
+        _api.Latest = Now.AddDays(-3);
+        _api.WmiThrows = new InvalidOperationException("Type incompatible");
+        _api.FallbackCode = 1058;
+        var r = Service().Create("Avant Unpark", forceIfRecent: false);
+        Assert.Equal(RestorePointOutcome.Failed, r.Outcome);
+        Assert.Contains("Type incompatible", r.Message);
+        Assert.Contains("1058", r.Message);
     }
 }

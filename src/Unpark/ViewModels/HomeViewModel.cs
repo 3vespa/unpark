@@ -9,7 +9,7 @@ using Unpark.Services;
 
 namespace Unpark.ViewModels;
 
-/// <summary>Accueil : état administrateur, sécurité (point de restauration, tout annuler, journaux) et réglage de test.</summary>
+/// <summary>Accueil : état administrateur, sécurité (point de restauration, tout annuler, journaux).</summary>
 public sealed partial class HomeViewModel : PageViewModel
 {
     private static AppServices S => AppServices.Current;
@@ -33,8 +33,6 @@ public sealed partial class HomeViewModel : PageViewModel
 
     [ObservableProperty] private string _restorePointText = "Recherche…";
     [ObservableProperty] private string _activeChangesText = "";
-    [ObservableProperty] private string _demoStateText = "";
-    [ObservableProperty] private bool _demoApplied;
 
     private void Refresh()
     {
@@ -42,8 +40,6 @@ public sealed partial class HomeViewModel : PageViewModel
         ActiveChangesText = count == 0
             ? "Aucun réglage modifié par Unpark : ton PC est dans son état d'origine."
             : $"{count} réglage(s) modifié(s) par Unpark. « Tout annuler » remet l'état d'origine exact.";
-        DemoApplied = S.Demo.IsApplied();
-        DemoStateText = DemoApplied ? "Activé (valeur écrite, sauvegarde faite)" : "Désactivé";
         _ = LoadRestorePointAsync();
     }
 
@@ -60,12 +56,6 @@ public sealed partial class HomeViewModel : PageViewModel
 
     [RelayCommand]
     private Task RevertAllAsync() => SafetyFlow.RevertAllAsync();
-
-    [RelayCommand]
-    private Task ApplyDemoAsync() => SafetyFlow.ApplyAsync(S.Demo);
-
-    [RelayCommand]
-    private Task RevertDemoAsync() => SafetyFlow.RevertAsync(S.Demo);
 
     [RelayCommand]
     private void OpenLogs() => OpenFolder(S.Paths.LogsDir);

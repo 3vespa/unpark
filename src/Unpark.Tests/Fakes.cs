@@ -36,7 +36,11 @@ public sealed class FakeRestoreApi : IRestorePointApi
     /// <summary>Ce que fait Windows quand on demande une création : par défaut, en crée un « maintenant ».</summary>
     public Func<DateTime?>? OnCreate { get; set; }
     public int Calls { get; private set; }
+    public int FallbackCalls { get; private set; }
     public Action? DuringCreate { get; set; }
+    /// <summary>Simule une méthode WMI en échec.</summary>
+    public Exception? WmiThrows { get; set; }
+    public uint FallbackCode { get; set; }
 
     public DateTime? GetLatestUtc() => Latest;
 
@@ -44,6 +48,15 @@ public sealed class FakeRestoreApi : IRestorePointApi
     {
         Calls++;
         DuringCreate?.Invoke();
+        if (WmiThrows is not null) throw WmiThrows;
+        Latest = OnCreate is null ? DateTime.UtcNow : OnCreate();
+        return 0;
+    }
+
+    public uint CreateFallback(string description)
+    {
+        FallbackCalls++;
+        if (FallbackCode != 0) return FallbackCode;
         Latest = OnCreate is null ? DateTime.UtcNow : OnCreate();
         return 0;
     }

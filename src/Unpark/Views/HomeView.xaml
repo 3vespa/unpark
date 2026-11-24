@@ -55,21 +55,5 @@
             </StackPanel>
         </Border>
 
-        <!-- Réglage de test (étape 2) -->
-        <TextBlock Text="Réglage de test" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,0" />
-        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
-            <StackPanel>
-                <TextBlock Style="{StaticResource DimText}"
-                           Text="Sans aucun effet sur Windows : écrit une valeur dans HKCU\Software\Unpark, pour vérifier la sauvegarde, le journal et l'annulation." />
-                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                    <TextBlock Text="État : " Style="{StaticResource DimText}" />
-                    <TextBlock Text="{Binding DemoStateText}" Style="{StaticResource BodyText}" />
-                </StackPanel>
-                <WrapPanel Margin="0,14,0,0">
-                    <Button Content="Appliquer" Style="{StaticResource AccentButton}" Command="{Binding ApplyDemoCommand}" Margin="0,0,10,0" />
-                    <Button Content="Annuler" Command="{Binding RevertDemoCommand}" />
-                </WrapPanel>
-            </StackPanel>
-        </Border>
     </StackPanel>
 </UserControl>

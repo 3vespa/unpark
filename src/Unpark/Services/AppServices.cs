@@ -1,7 +1,9 @@
 using System.Security.Principal;
 using Unpark.Core;
 using Unpark.Core.Backup;
+using Unpark.Core.Commands;
 using Unpark.Core.Logging;
+using Unpark.Core.Power;
 using Unpark.Core.Registry;
 using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
@@ -20,8 +22,10 @@ public sealed class AppServices
         Backup = new BackupStore(Paths.BackupFile, Log);
         Registry = new WindowsRegistry();
         Context = new SettingContext(Registry, Backup, Log);
-        Demo = new DemoSetting(Context);
-        Engine = new SettingsEngine(Context, [Demo], SettingsEngine.SystemLastBootUtc);
+        Commands = new ProcessCommandRunner();
+        Power = new WindowsPowerApi();
+        PowerPlan = new UnparkPowerPlan(Context, Power, Commands);
+        Engine = new SettingsEngine(Context, [PowerPlan], SettingsEngine.SystemLastBootUtc);
         RestorePoints = new RestorePointService(new WmiRestorePointApi(), Registry, Log);
     }
 
@@ -32,7 +36,9 @@ public sealed class AppServices
     public SettingContext Context { get; }
     public SettingsEngine Engine { get; }
     public RestorePointService RestorePoints { get; }
-    public DemoSetting Demo { get; }
+    public ICommandRunner Commands { get; }
+    public IPowerApi Power { get; }
+    public UnparkPowerPlan PowerPlan { get; }
 
     /// <summary>Prévient les écrans qu'un réglage a changé (bandeau de redémarrage, compteurs…).</summary>
     public event Action? StateChanged;
