@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Logique de l'appli (réglages, sauvegarde, journal, powercfg).
+    En net8.0 « simple » pour que les tests tournent aussi sous Linux : tout ce qui touche
+    Windows passe par de petites interfaces, remplacées par des fausses versions dans les tests.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Unpark.Core</RootNamespace>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,16 @@
+<Project>
+  <!-- Réglages communs à tous les projets. La version est ici, et seulement ici. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Product>Unpark</Product>
+    <Description>Optimisation PC gaming</Description>
+    <Company>Unpark</Company>
+    <Copyright>Unpark</Copyright>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Version affichée sans le suffixe « +commit » ajouté par le SDK. -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

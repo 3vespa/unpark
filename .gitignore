@@ -1,0 +1,8 @@
+# Compilation .NET
+bin/
+obj/
+*.user
+.vs/
+# Les .exe publiés ne vont pas dans git (trop lourds) : ils sont dans releases/
+releases/
+publish/
