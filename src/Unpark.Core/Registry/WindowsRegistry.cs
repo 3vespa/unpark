@@ -44,6 +44,13 @@ public sealed class WindowsRegistry : IRegistry
         }
     }
 
+    public IReadOnlyList<string> ValueNames(RegHive hive, string key)
+    {
+        using var root = Root(hive);
+        using var k = root.OpenSubKey(key);
+        return k?.GetValueNames().Where(n => n.Length > 0).ToList() ?? [];
+    }
+
     public void Delete(RegPath path)
     {
         using var root = Root(path.Hive);

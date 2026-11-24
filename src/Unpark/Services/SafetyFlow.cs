@@ -75,6 +75,23 @@ public static class SafetyFlow
         Report(result);
     }
 
+    /// <summary>Applique plusieurs réglages à la suite (point de restauration proposé une seule fois), puis affiche un récapitulatif.</summary>
+    public static async Task<IReadOnlyList<OperationResult>> ApplyManyAsync(IReadOnlyList<ISetting> settings, bool showSummary = true)
+    {
+        if (settings.Count == 0 || !await BeforeFirstChangeAsync()) return [];
+        var results = await S.RunBusyAsync($"Application de {settings.Count} réglage(s)…",
+            () => settings.Select(s => S.Engine.Apply(s)).ToList());
+        S.NotifyChanged();
+        if (showSummary)
+        {
+            var failed = results.Where(r => !r.Success).ToList();
+            var restart = results.Any(r => r.Success && r.RestartRequired) ? "\n\nRedémarre le PC pour terminer." : "";
+            if (failed.Count == 0) Dialogs.Info($"{results.Count} réglage(s) appliqué(s).{restart}");
+            else Dialogs.Warn($"{results.Count - failed.Count} réglage(s) appliqué(s), {failed.Count} en échec :\n\n{string.Join("\n", failed.Select(f => "• " + f.Message))}{restart}");
+        }
+        return results;
+    }
+
     public static async Task RevertAsync(ISetting setting)
     {
         var result = await S.RunBusyAsync($"Annulation : {setting.Name}…", () => S.Engine.Revert(setting));

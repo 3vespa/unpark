@@ -20,6 +20,9 @@ public sealed class FakeRegistry : IRegistry
     }
 
     public void Delete(RegPath path) => Values.Remove(path);
+
+    public IReadOnlyList<string> ValueNames(RegHive hive, string key) =>
+        Values.Keys.Where(p => p.Hive == hive && string.Equals(p.Key, key, StringComparison.OrdinalIgnoreCase)).Select(p => p.Name).ToList();
 }
 
 public sealed class MemoryLog : IActionLog

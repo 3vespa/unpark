@@ -1,0 +1,21 @@
+<UserControl x:Class="Unpark.Views.GamingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Unpark.Views">
+    <StackPanel>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Content="Tout appliquer (sauf effets visuels)" Style="{StaticResource AccentButton}"
+                    Command="{Binding ApplyAllCommand}" VerticalAlignment="Center" />
+            <TextBlock Text="Gaming" Style="{StaticResource TitleText}" />
+        </DockPanel>
+        <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,20"
+                   Text="Réglages Windows utiles en jeu. Chaque réglage s'annule séparément, ou tous ensemble avec « Tout annuler » sur l'accueil." />
+        <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <v:SettingCard />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

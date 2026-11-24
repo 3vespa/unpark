@@ -84,4 +84,6 @@ public interface IRegistry
     void Set(RegPath path, RegValue value);
     /// <summary>Supprime la valeur (sans erreur si elle n'existe pas).</summary>
     void Delete(RegPath path);
+    /// <summary>Noms des valeurs d'une clé (vide si la clé n'existe pas).</summary>
+    IReadOnlyList<string> ValueNames(RegHive hive, string key);
 }

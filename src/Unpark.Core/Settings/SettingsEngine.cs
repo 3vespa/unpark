@@ -8,7 +8,9 @@ public sealed record OperationResult(bool Success, string Message, bool RestartR
 /// Applique / annule les réglages avec journal, gestion d'erreur et suivi des redémarrages.
 /// Si Apply() échoue en cours de route, ce qui a déjà été modifié est remis à l'état d'origine.
 /// </summary>
-public sealed class SettingsEngine(SettingContext ctx, IEnumerable<ISetting> catalog, Func<DateTime> lastBootUtc)
+/// <param name="resolver">Retrouve un réglage créé à la volée (ex. un programme au démarrage) à partir de son identifiant.</param>
+public sealed class SettingsEngine(
+    SettingContext ctx, IEnumerable<ISetting> catalog, Func<DateTime> lastBootUtc, Func<string, ISetting?>? resolver = null)
 {
     private readonly Dictionary<string, ISetting> _catalog = catalog.ToDictionary(s => s.Id);
     private IActionLog Log => ctx.Log;
@@ -65,7 +67,7 @@ public sealed class SettingsEngine(SettingContext ctx, IEnumerable<ISetting> cat
         var results = new List<OperationResult>();
         foreach (var entry in ctx.Backup.Entries.Reverse())
         {
-            if (_catalog.TryGetValue(entry.SettingId, out var setting))
+            if (_catalog.TryGetValue(entry.SettingId, out var setting) || (setting = Resolve(entry.SettingId)) is not null)
             {
                 results.Add(Revert(setting));
                 continue;
@@ -83,6 +85,16 @@ public sealed class SettingsEngine(SettingContext ctx, IEnumerable<ISetting> cat
             }
         }
         return results;
+    }
+
+    private ISetting? Resolve(string id)
+    {
+        try { return resolver?.Invoke(id); }
+        catch (Exception e)
+        {
+            Log.Warn($"Réglage « {id} » introuvable : {e.Message}");
+            return null;
+        }
     }
 
     /// <summary>Noms des réglages qui attendent un redémarrage de Windows.</summary>
