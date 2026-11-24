@@ -1,7 +1,7 @@
 /* Unpark — site vitrine. Couleurs de l'appli, police Space Grotesk hébergée sur le site (licence OFL). */
 @font-face {
   font-family: "Space Grotesk";
-  src: url("/fonts/SpaceGrotesk-latin.woff2") format("woff2");
+  src: url("fonts/SpaceGrotesk-latin.woff2") format("woff2");
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
