@@ -1,5 +1,0 @@
-# Cloudflare Pages : le site est le dossier site/ tel quel (aucune étape de construction).
-# Utilisé seulement si tu déploies en ligne de commande (npx wrangler pages deploy).
-name = "unpark"
-pages_build_output_dir = "./site"
-compatibility_date = "2026-11-01"

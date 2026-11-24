@@ -106,7 +106,7 @@ python3 scripts/make-icons.py      # régénère les icônes (exe, favicon) à p
 ./scripts/prepare-release.sh       # met le site à jour (version, taille, date, SHA-256) et écrit releases/notes-vX.Y.Z.md
 ```
 
-- `site/` : site vitrine statique (HTML + CSS, aucune dépendance, police Space Grotesk hébergée sur place, licence OFL dans `site/fonts/`). Déployable tel quel sur **Cloudflare Pages** (dossier de sortie `site`, pas de commande de build).
-- L'exe (~70 Mo) va sur **GitHub Releases** : Cloudflare Pages refuse les fichiers de plus de 25 Mo.
+- `site/` : site vitrine statique (HTML + CSS, aucune dépendance, police Space Grotesk hébergée sur place, licence OFL dans `site/fonts/`). Publié comme **Worker Cloudflare à fichiers statiques** : `wrangler.jsonc` à la racine (`npx wrangler deploy`), en-têtes dans `site/_headers`, page `site/404.html` pour les adresses inconnues.
+- L'exe (~70 Mo) va sur **GitHub Releases** : Cloudflare refuse les fichiers statiques de plus de 25 Mo.
 - `scripts/release.conf` : le dépôt GitHub des releases (`pseudo/depot`).
-- `prepare-release.sh` ne publie rien : il affiche les commandes `gh release create` et `wrangler pages deploy` à lancer soi-même.
+- `prepare-release.sh` ne publie rien : il affiche les commandes `gh release create` et `wrangler deploy` à lancer soi-même.

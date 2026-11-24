@@ -1,0 +1,12 @@
+// Site vitrine d'Unpark : Worker Cloudflare à fichiers statiques (aucun code serveur).
+// Déploiement : « npx wrangler deploy » à la racine du dépôt, ou Workers Builds relié au dépôt GitHub.
+{
+  "name": "unpark",
+  "compatibility_date": "2026-11-20",
+  "assets": {
+    // Contenu publié tel quel (HTML, CSS, police, icônes). Le fichier _headers y est lu par Cloudflare, pas servi.
+    "directory": "./site",
+    // Adresse inconnue : site/404.html avec le statut 404.
+    "not_found_handling": "404-page"
+  }
+}

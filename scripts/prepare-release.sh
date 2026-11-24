@@ -69,6 +69,6 @@ Rien n'a été publié. Pour publier, lance toi-même :
   # 1. Publier l'exe sur GitHub Releases (crée le tag v$VERSION)
   gh release create v$VERSION "$EXE" --repo "$GITHUB_REPO" --title "Unpark v$VERSION" --notes-file "$NOTES"
 
-  # 2. Mettre le site en ligne (si tu n'as pas relié Cloudflare Pages au dépôt GitHub)
-  npx wrangler pages deploy site --project-name unpark
+  # 2. Mettre le site en ligne (si le Worker Cloudflare n'est pas relié au dépôt GitHub)
+  npx wrangler deploy
 CMDS_EOF
