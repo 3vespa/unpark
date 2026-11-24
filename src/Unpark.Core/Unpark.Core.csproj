@@ -8,4 +8,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Unpark.Core</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- WMI (points de restauration, infos système). Fonctionne seulement sous Windows. -->
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Unpark.Tests" />
+  </ItemGroup>
 </Project>

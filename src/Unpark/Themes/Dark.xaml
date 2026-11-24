@@ -26,6 +26,7 @@
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
 
     <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
 
     <!-- Textes -->
     <Style x:Key="TitleText" TargetType="TextBlock">
@@ -91,6 +92,7 @@
 
     <!-- Élément du menu de gauche -->
     <Style x:Key="NavItem" TargetType="ListBoxItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{StaticResource TextDimBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />

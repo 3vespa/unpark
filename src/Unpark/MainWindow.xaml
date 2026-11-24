@@ -40,9 +40,30 @@
             </DockPanel>
         </Border>
 
-        <!-- Page affichée -->
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
-            <ContentControl Content="{Binding SelectedPage}" Margin="36,32" />
-        </ScrollViewer>
+        <!-- Page affichée, avec le bandeau de redémarrage au-dessus -->
+        <DockPanel Grid.Column="1">
+            <Border DockPanel.Dock="Top" Background="{StaticResource WarnBrush}" Padding="20,10"
+                    Visibility="{Binding RestartNeeded, Converter={StaticResource BoolToVis}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Redémarrer maintenant" Command="{Binding RestartNowCommand}" Padding="14,6" />
+                    <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="#1A1200" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding RestartText}" Foreground="#1A1200" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" TextWrapping="Wrap" />
+                </DockPanel>
+            </Border>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ContentControl Content="{Binding SelectedPage}" Margin="36,32" />
+            </ScrollViewer>
+        </DockPanel>
+
+        <!-- Opération en cours : bloque l'appli le temps qu'elle se termine -->
+        <Grid Grid.ColumnSpan="2" Background="#C0000000" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+            <Border Style="{StaticResource Card}" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="360">
+                <StackPanel>
+                    <TextBlock Text="{Binding BusyText}" Style="{StaticResource BodyText}" HorizontalAlignment="Center" TextAlignment="Center" />
+                    <ProgressBar IsIndeterminate="True" Height="4" Margin="0,16,0,0" Foreground="{StaticResource AccentBrush}"
+                                 Background="{StaticResource BorderBrush}" BorderThickness="0" />
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

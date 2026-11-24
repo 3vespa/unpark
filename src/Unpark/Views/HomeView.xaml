@@ -1,9 +1,6 @@
 <UserControl x:Class="Unpark.Views.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-    </UserControl.Resources>
     <StackPanel>
         <TextBlock Text="{Binding Welcome}" Style="{StaticResource TitleText}" />
         <TextBlock Text="Optimise ton PC pour le jeu, sans rien casser : chaque réglage s'annule en un clic."
@@ -30,9 +27,49 @@
             </Grid>
         </Border>
 
-        <Border Style="{StaticResource Card}" Margin="0,16,0,0">
-            <TextBlock Style="{StaticResource DimText}"
-                       Text="Version de démonstration (étape 1) : aucun réglage n'est encore disponible, rien n'est modifié sur ce PC." />
+        <!-- Sauvegarde illisible au démarrage -->
+        <Border Style="{StaticResource Card}" Margin="0,16,0,0" BorderBrush="{StaticResource DangerBrush}"
+                Visibility="{Binding HasBackupWarning, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding BackupWarning}" Style="{StaticResource BodyText}" Foreground="{StaticResource DangerBrush}" />
+        </Border>
+
+        <!-- Sécurité -->
+        <TextBlock Text="Sécurité" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,0" />
+        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding RestorePointText}" Style="{StaticResource BodyText}" />
+                <TextBlock Style="{StaticResource DimText}" Margin="0,4,0,0"
+                           Text="Un point de restauration permet de remettre Windows dans l'état d'avant, même si Unpark ne s'ouvre plus." />
+                <Button Content="Créer un point de restauration" Command="{Binding CreateRestorePointCommand}"
+                        HorizontalAlignment="Left" Margin="0,14,0,0" />
+            </StackPanel>
+        </Border>
+        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding ActiveChangesText}" Style="{StaticResource BodyText}" />
+                <WrapPanel Margin="0,14,0,0">
+                    <Button Content="Tout annuler" Command="{Binding RevertAllCommand}" Margin="0,0,10,0" />
+                    <Button Content="Ouvrir les journaux" Command="{Binding OpenLogsCommand}" Margin="0,0,10,0" />
+                    <Button Content="Ouvrir le dossier de sauvegarde" Command="{Binding OpenBackupFolderCommand}" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Réglage de test (étape 2) -->
+        <TextBlock Text="Réglage de test" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,0" />
+        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Style="{StaticResource DimText}"
+                           Text="Sans aucun effet sur Windows : écrit une valeur dans HKCU\Software\Unpark, pour vérifier la sauvegarde, le journal et l'annulation." />
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="État : " Style="{StaticResource DimText}" />
+                    <TextBlock Text="{Binding DemoStateText}" Style="{StaticResource BodyText}" />
+                </StackPanel>
+                <WrapPanel Margin="0,14,0,0">
+                    <Button Content="Appliquer" Style="{StaticResource AccentButton}" Command="{Binding ApplyDemoCommand}" Margin="0,0,10,0" />
+                    <Button Content="Annuler" Command="{Binding RevertDemoCommand}" />
+                </WrapPanel>
+            </StackPanel>
         </Border>
     </StackPanel>
 </UserControl>
