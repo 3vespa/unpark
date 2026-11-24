@@ -17,6 +17,7 @@ public sealed partial class MainViewModel : ObservableObject
             new DiagnosticViewModel(),
             new OneClickViewModel(),
             new PowerPlanViewModel(),
+            new DynamicViewModel(),
             new GamingViewModel(),
             new StartupViewModel(),
             new CleanupViewModel(),

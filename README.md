@@ -43,6 +43,7 @@ Unpark ne garde que des réglages à l'effet reconnu, et dit honnêtement ce que
 | **HAGS** | Nécessaire pour DLSS Frame Generation (RTX 40/50, recommandé seulement là). Ailleurs, effet quasi nul et peut réserver de la mémoire vidéo sur les cartes de 6-8 Go. Redémarrage requis. | ✅ |
 | **Accélération de la souris désactivée** | Aucun gain de FPS : rend la visée constante. | ✅ |
 | **Intégrité de la mémoire désactivée** | 0 à ~10 % selon le processeur et le jeu, **mais moins de sécurité**. Jamais dans le profil 1 clic, avertissement avant. Redémarrage requis. | ✅ |
+| **Mode dynamique** | Unpark Performance quand tu utilises le PC, Équilibré après X minutes d'inactivité (icône « U » dans la zone de notification). Moins de consommation et de bruit au repos ; en jeu, mêmes performances que le plan permanent. | ✅ « Arrêter », et la tâche de démarrage s'annule |
 | **Démarrage** | Windows démarre plus vite ; en jeu, utile seulement si ces programmes consomment en fond. | ✅ réactiver remet l'état d'origine |
 | **Nettoyage** | Espace disque uniquement, aucun effet sur les FPS (corbeille décochée par défaut). | ❌ fichiers supprimés pour de bon |
 | **Debloat** | Rangement : quasi aucun effet sur les FPS. Le Store, la Calculatrice, Photos, le Terminal et les applis Xbox ne sont jamais proposés. | ⚠️ réinstallation depuis le Microsoft Store (bouton dans la page) |
@@ -50,6 +51,15 @@ Unpark ne garde que des réglages à l'effet reconnu, et dit honnêtement ce que
 | **Infos système** | Processeur, carte graphique, mémoire, disques… Bouton **« Copier le résumé »**. | — |
 
 Ce qu'Unpark ne fait **jamais**, parce que c'est inutile ou risqué : désactiver Windows Defender, le pare-feu ou Windows Update, « nettoyer la RAM », réglages réseau du registre « anti-ping », désactivation de services au hasard, commandes bcdedit (HPET, dynamic tick…), résolution de la minuterie, effets visuels « performances » (aucun effet en jeu).
+
+### Mode dynamique (optionnel)
+
+1. Installe d'abord le plan (page **Plan d'alimentation**).
+2. Page **Mode dynamique** → **Démarrer le mode dynamique** : une icône « U » apparaît près de l'horloge (vert = Unpark Performance, gris = Équilibré, orange = en pause).
+3. Pour qu'il se lance tout seul avec Windows : **Lancer le mode dynamique avec Windows → Appliquer**.
+4. Clic droit sur l'icône : mettre en pause, forcer un plan, ouvrir Unpark, quitter.
+
+Bon à savoir : une manette n'est pas vue par Windows comme une activité, c'est pourquoi un jeu ou une vidéo **en plein écran** compte aussi comme une activité. Si tu changes de plan à la main, le mode dynamique se met en pause au lieu de se battre avec toi.
 
 ## 4. Tout annuler
 

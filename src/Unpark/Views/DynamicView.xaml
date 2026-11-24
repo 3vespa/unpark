@@ -1,0 +1,47 @@
+<UserControl x:Class="Unpark.Views.DynamicView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Unpark.Views">
+    <StackPanel>
+        <TextBlock Text="Mode dynamique" Style="{StaticResource TitleText}" />
+        <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
+                   Text="Comme ParkControl : Unpark Performance quand tu utilises le PC, Équilibré après quelques minutes d'inactivité. Ce que ça apporte vraiment : moins de consommation, de chaleur et de bruit quand le PC attend ; en jeu, exactement les mêmes performances qu'avec le plan Unpark permanent." />
+
+        <Border Style="{StaticResource Card}" Margin="0,20,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource BodyText}" FontWeight="SemiBold" />
+                <WrapPanel Margin="0,14,0,0">
+                    <Button Content="Démarrer le mode dynamique" Style="{StaticResource AccentButton}" Command="{Binding StartCommand}" Margin="0,0,10,0" />
+                    <Button Content="Arrêter" Command="{Binding StopCommand}" IsEnabled="{Binding Running}" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Réglages" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,12" />
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <CheckBox IsChecked="{Binding Enabled}">
+                    <TextBlock Text="Basculer automatiquement selon mon activité" Style="{StaticResource BodyText}" />
+                </CheckBox>
+                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                    <TextBlock Text="Passer en Équilibré après" Style="{StaticResource BodyText}" VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding IdleChoices}" SelectedItem="{Binding IdleMinutes}" Width="70" Margin="10,0" />
+                    <TextBlock Text="minutes sans clavier ni souris" Style="{StaticResource BodyText}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource DimText}" FontSize="12" Margin="0,12,0,0"
+                           Text="Une manette n'est pas vue comme une activité par Windows : un jeu ou une vidéo en plein écran compte donc aussi comme une activité. Si tu changes de plan à la main, le mode se met en pause (clic droit sur l'icône → « Reprendre »). Les réglages sont pris en compte en quelques secondes, sans relancer." />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Démarrage avec Windows" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,12" />
+        <ContentControl Content="{Binding Autostart}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate>
+                    <v:SettingCard />
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
+        <TextBlock Style="{StaticResource DimText}" FontSize="12" Margin="0,0,0,0"
+                   Text="La tâche lance cet exe-ci : si tu déplaces Unpark ou passes à une nouvelle version, clique de nouveau sur « Appliquer »." />
+    </StackPanel>
+</UserControl>
