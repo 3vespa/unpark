@@ -13,7 +13,12 @@ public sealed partial class GamingViewModel : PageViewModel
     public GamingViewModel() : base("Gaming", "")
     {
         foreach (var setting in S.Gaming)
-            Items.Add(new SettingItemViewModel(setting, setting.Id == GamingSettings.VisualFxId ? "Optionnel" : null));
+            Items.Add(new SettingItemViewModel(setting, setting.Id switch
+            {
+                GamingSettings.MouseId => "Optionnel : confort de visée, pas de gain de performances.",
+                GamingSettings.MemoryIntegrityId => "Optionnel : compromis entre sécurité et FPS. Un avertissement s'affiche avant.",
+                _ => null,
+            }));
         S.StateChanged += () => { foreach (var item in Items) item.Refresh(); };
         _ = LoadHagsAdviceAsync();
     }
@@ -29,10 +34,16 @@ public sealed partial class GamingViewModel : PageViewModel
 
     public ObservableCollection<SettingItemViewModel> Items { get; }  = [];
 
-    /// <summary>Tout le module sauf les effets visuels (optionnels) ; HAGS seulement s'il est recommandé pour la carte.</summary>
+    /// <summary>
+    /// Réglages recommandés : Mode Jeu, enregistrement en arrière-plan, jeux en fenêtre (si disponible),
+    /// HAGS seulement sur RTX 40/50. Jamais la souris (confort) ni l'Intégrité de la mémoire (sécurité).
+    /// </summary>
     [RelayCommand]
     private Task ApplyAllAsync() =>
         SafetyFlow.ApplyManyAsync(S.Gaming
-            .Where(s => s.Id != GamingSettings.VisualFxId && (s.Id != GamingSettings.HagsId || _hagsRecommended) && !s.IsApplied())
+            .Where(s => s.Id is GamingSettings.GameModeId or GamingSettings.GameDvrId or GamingSettings.WindowedGamesId
+                        || (s.Id == GamingSettings.HagsId && _hagsRecommended))
+            .Where(s => s is not IConditionalSetting c || c.UnavailableReason() is null)
+            .Where(s => !s.IsApplied())
             .ToList());
 }

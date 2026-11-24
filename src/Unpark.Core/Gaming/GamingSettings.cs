@@ -4,38 +4,160 @@ using Unpark.Core.Settings;
 
 namespace Unpark.Core.Gaming;
 
-/// <summary>Réglages du module Gaming. Les identifiants servent de clés dans backup.json : ne jamais les renommer.</summary>
+/// <summary>
+/// Réglages du module Gaming, retenus après l'audit : seulement ceux qui ont un effet reconnu.
+/// Les identifiants servent de clés dans backup.json : ne jamais les renommer.
+/// </summary>
 public static class GamingSettings
 {
     public const string GameModeId = "gaming.gamemode";
     public const string HagsId = "gaming.hags";
     public const string GameDvrId = "gaming.gamedvr";
+    public const string WindowedGamesId = "gaming.windowedgames";
     public const string MouseId = "gaming.mouseaccel";
+    public const string MemoryIntegrityId = "gaming.memoryintegrity";
+    /// <summary>Retiré après l'audit (aucun effet en jeu) : gardé seulement pour annuler les sauvegardes existantes.</summary>
     public const string VisualFxId = "gaming.visualfx";
 
-    public static IReadOnlyList<ISetting> Create(SettingContext ctx, ISystemUiApi ui) =>
+    /// <summary>Réglages proposés dans l'appli.</summary>
+    /// <param name="windowsBuild">Numéro de build de Windows (certains réglages n'existent que sur Windows 11).</param>
+    public static IReadOnlyList<ISetting> Create(SettingContext ctx, ISystemUiApi ui, int windowsBuild) =>
     [
-        new RegistrySetting(ctx, GameModeId, "Mode Jeu Windows",
-            "Windows donne la priorité au jeu en cours (processeur, carte graphique) et évite les installations de mises à jour pendant la partie.",
+        new RegistrySetting(ctx, GameModeId, "Mode Jeu",
+            "Windows donne la priorité au jeu et n'installe pas de mises à jour pendant la partie. Effet faible, mais réel quand Windows travaille en fond.",
             requiresRestart: false,
             [new(new RegPath(RegHive.CurrentUser, @"Software\Microsoft\GameBar", "AutoGameModeEnabled"), RegValue.DWord(1))]),
 
-        new RegistrySetting(ctx, HagsId, "Planification GPU à accélération matérielle (HAGS)",
-            "La carte graphique gère elle-même sa mémoire : un peu moins de latence. Nécessite une carte et un pilote compatibles (WDDM 2.7+).",
-            requiresRestart: true,
-            [new(new RegPath(RegHive.LocalMachine, @"SYSTEM\CurrentControlSet\Control\GraphicsDrivers", "HwSchMode"), RegValue.DWord(2))]),
-
-        new RegistrySetting(ctx, GameDvrId, "Captures en arrière-plan (Game DVR)",
-            "Désactive l'enregistrement vidéo en continu de la Xbox Game Bar, qui consomme des ressources pendant le jeu.",
+        new RegistrySetting(ctx, GameDvrId, "Enregistrement en arrière-plan (Game Bar) désactivé",
+            "Coupe l'enregistrement vidéo en continu de la Xbox Game Bar : quelques % de FPS récupérés s'il était actif, rien sinon. " +
+            "Tu perds « Enregistrer ce qui vient de se passer ».",
             requiresRestart: false,
             [
                 new(new RegPath(RegHive.CurrentUser, @"System\GameConfigStore", "GameDVR_Enabled"), RegValue.DWord(0)),
                 new(new RegPath(RegHive.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\GameDVR", "AppCaptureEnabled"), RegValue.DWord(0)),
             ]),
 
+        new WindowedGamesSetting(ctx, windowsBuild),
+
+        new RegistrySetting(ctx, HagsId, "Planification GPU à accélération matérielle (HAGS)",
+            "Nécessaire pour DLSS Frame Generation (RTX 40/50). Sur les autres cartes, effet quasi nul en FPS.",
+            requiresRestart: true,
+            [new(new RegPath(RegHive.LocalMachine, @"SYSTEM\CurrentControlSet\Control\GraphicsDrivers", "HwSchMode"), RegValue.DWord(2))]),
+
         new MouseAccelerationSetting(ctx, ui),
-        new VisualEffectsSetting(ctx, ui),
+        new MemoryIntegritySetting(ctx),
     ];
+
+    /// <summary>Réglages retirés de l'interface, mais encore annulables (« Tout annuler ») pour ceux qui les avaient appliqués.</summary>
+    public static IReadOnlyList<ISetting> Legacy(SettingContext ctx, ISystemUiApi ui) => [new VisualEffectsSetting(ctx, ui)];
+}
+
+/// <summary>Réglage qui peut ne pas exister sur ce PC (version de Windows, verrou de sécurité…).</summary>
+public interface IConditionalSetting
+{
+    /// <summary>null si le réglage est disponible, sinon la raison (affichée à l'utilisateur).</summary>
+    string? UnavailableReason();
+}
+
+/// <summary>Réglage qui demande une confirmation avec un avertissement avant d'être appliqué.</summary>
+public interface IWarnedSetting
+{
+    string Warning { get; }
+}
+
+/// <summary>
+/// « Optimisations pour les jeux en fenêtre » (Windows 11 22H2+, Paramètres → Affichage → Graphiques) :
+/// les jeux DirectX 10/11 en fenêtre sans bordure passent au « flip model » (latence plus basse, Auto HDR et VRR en fenêtré).
+/// La valeur DirectXUserGlobalSettings contient d'autres réglages (Auto HDR, VRR…) : on ne change que SwapEffectUpgradeEnable.
+/// </summary>
+public sealed class WindowedGamesSetting(SettingContext ctx, int windowsBuild) : ISetting, IConditionalSetting
+{
+    public static readonly RegPath ValuePath = new(RegHive.CurrentUser, @"Software\Microsoft\DirectX\UserGpuPreferences", "DirectXUserGlobalSettings");
+    private const string Key = "SwapEffectUpgradeEnable";
+    /// <summary>Windows 11 22H2.</summary>
+    public const int MinBuild = 22621;
+
+    public string Id => GamingSettings.WindowedGamesId;
+    public string Name => "Optimisations pour les jeux en fenêtre";
+    public string Description => "Jeux DirectX 10/11 en fenêtre sans bordure : latence plus basse, Auto HDR et VRR en fenêtré. Aucun effet en plein écran exclusif.";
+    public bool RequiresRestart => false;
+
+    public string? UnavailableReason() => windowsBuild >= MinBuild ? null : "Disponible seulement sur Windows 11 (22H2 ou plus récent).";
+
+    public bool IsApplied() => Parse(ctx.Registry.Get(ValuePath)?.Text).TryGetValue(Key, out var v) && v == "1";
+
+    public void Apply()
+    {
+        if (UnavailableReason() is { } reason) throw new InvalidOperationException(reason);
+        var current = ctx.Registry.Get(ValuePath);
+        ctx.Backup.RecordOriginal(Id, Name, ValuePath.BackupKey, BackupValue.Of(current));
+        var pairs = Parse(current?.Text);
+        pairs[Key] = "1";
+        var value = RegValue.String(Join(pairs));
+        ctx.Registry.Set(ValuePath, value);
+        ctx.Log.Info($"[{Name}] {ValuePath} : {current?.ToString() ?? "(absente)"} → {value}");
+    }
+
+    public void Revert() => RegistrySetting.RevertFromBackup(ctx, Id, Name);
+
+    /// <summary>« A=1;B=0; » → dictionnaire, ordre conservé.</summary>
+    internal static Dictionary<string, string> Parse(string? text)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var part in (text ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var eq = part.IndexOf('=');
+            if (eq > 0) dict[part[..eq]] = part[(eq + 1)..];
+        }
+        return dict;
+    }
+
+    internal static string Join(Dictionary<string, string> pairs) => string.Concat(pairs.Select(p => $"{p.Key}={p.Value};"));
+}
+
+/// <summary>
+/// Désactive l'Intégrité de la mémoire (HVCI, isolation du noyau). Microsoft documente son coût en jeu,
+/// mais c'est une vraie protection : décochée partout, avertissement obligatoire, redémarrage requis.
+/// Refusé si le réglage est verrouillé (UEFI) ou imposé par une stratégie de groupe.
+/// </summary>
+public sealed class MemoryIntegritySetting(SettingContext ctx) : RegistrySetting(
+    ctx,
+    GamingSettings.MemoryIntegrityId,
+    "Intégrité de la mémoire désactivée",
+    "Peut faire gagner de 0 à environ 10 % selon le processeur et le jeu (moins sur les processeurs récents). " +
+    "Réduit la protection de Windows contre les pilotes malveillants.",
+    requiresRestart: true,
+    [new(EnabledPath, RegValue.DWord(0))]), IConditionalSetting, IWarnedSetting
+{
+    private const string Scenario = @"SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity";
+    public static readonly RegPath EnabledPath = new(RegHive.LocalMachine, Scenario, "Enabled");
+    public static readonly RegPath LockedPath = new(RegHive.LocalMachine, Scenario, "Locked");
+    public static readonly RegPath PolicyPath = new(RegHive.LocalMachine, @"SOFTWARE\Policies\Microsoft\Windows\DeviceGuard", "HypervisorEnforcedCodeIntegrity");
+
+    private readonly SettingContext _ctx = ctx;
+
+    public string Warning =>
+        "Désactiver l'Intégrité de la mémoire réduit la sécurité de Windows : elle empêche des pilotes malveillants de prendre le contrôle du système.\n\n" +
+        "Gain possible : de 0 à environ 10 % de FPS selon le processeur et le jeu (souvent moins sur les processeurs récents).\n\n" +
+        "Certains anti-triche peuvent exiger qu'elle reste activée : si un jeu refuse de se lancer, réactive-la (bouton Annuler).\n\n" +
+        "Un redémarrage est nécessaire. Continuer ?";
+
+    public string? UnavailableReason()
+    {
+        if (_ctx.Registry.Get(LockedPath) is { Number: 1 })
+            return "Verrouillée par le fabricant ou l'administrateur (UEFI) : Unpark n'y touche pas.";
+        if (_ctx.Registry.Get(PolicyPath) is { Number: > 0 })
+            return "Imposée par une stratégie de groupe (PC d'entreprise ou d'école) : Unpark n'y touche pas.";
+        return null;
+    }
+
+    public override bool IsApplied() => _ctx.Registry.Get(EnabledPath) is not { Number: not 0 };
+
+    public override void Apply()
+    {
+        if (UnavailableReason() is { } reason) throw new InvalidOperationException(reason);
+        base.Apply();
+    }
 }
 
 /// <summary>

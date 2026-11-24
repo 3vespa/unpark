@@ -13,7 +13,7 @@ public interface ICleanupSystem
     void StartService(string name);
 }
 
-public sealed record CleanupPaths(string UserTemp, string WindowsTemp, string UpdateDownload, string ThumbnailDir)
+public sealed record CleanupPaths(string UserTemp, string WindowsTemp, string UpdateDownload)
 {
     public static CleanupPaths Default
     {
@@ -23,13 +23,12 @@ public sealed record CleanupPaths(string UserTemp, string WindowsTemp, string Up
             return new(
                 Path.GetTempPath(),
                 Path.Combine(windows, "Temp"),
-                Path.Combine(windows, "SoftwareDistribution", "Download"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Windows", "Explorer"));
+                Path.Combine(windows, "SoftwareDistribution", "Download"));
         }
     }
 }
 
-public enum CleanupKind { Folder, WindowsUpdate, RecycleBin, Thumbnails }
+public enum CleanupKind { Folder, WindowsUpdate, RecycleBin }
 
 public sealed record CleanupTarget(string Id, string Label, string Description, CleanupKind Kind, string? Folder);
 
@@ -38,7 +37,8 @@ public sealed record CleanupScan(CleanupTarget Target, long Bytes, long Files);
 public sealed record CleanupResult(CleanupTarget Target, long FreedBytes, long Deleted, long Skipped, string? Error);
 
 /// <summary>
-/// Nettoyage : %TEMP%, C:\Windows\Temp, cache de Windows Update, corbeille, cache des miniatures.
+/// Nettoyage : %TEMP%, C:\Windows\Temp, cache de Windows Update, corbeille. Libère de l'espace disque, sans effet sur les FPS.
+/// (Le cache des miniatures a été retiré après l'audit : il est recréé aussitôt, le vider ne sert à rien.)
 /// Sécurité : fichiers verrouillés ignorés sans planter ; liens et jonctions jamais suivis ; fichiers temporaires de moins
 /// de 2 heures épargnés (installation en cours) ; Windows Update seulement arrêté le temps du nettoyage, puis toujours relancé.
 /// </summary>
@@ -56,7 +56,6 @@ public sealed class CleanupService(ICleanupSystem system, IActionLog log, Cleanu
         new("temp-windows", "Fichiers temporaires de Windows", "Dossier C:\\Windows\\Temp.", CleanupKind.Folder, paths.WindowsTemp),
         new("wu-cache", "Cache de Windows Update", "Mises à jour déjà installées, encore stockées. Windows Update est mis en pause le temps du nettoyage, puis relancé.", CleanupKind.WindowsUpdate, paths.UpdateDownload),
         new("recycle", "Corbeille", "Vide la corbeille de tous les disques.", CleanupKind.RecycleBin, null),
-        new("thumbs", "Cache des miniatures", "Aperçus d'images de l'Explorateur, recréés automatiquement.", CleanupKind.Thumbnails, paths.ThumbnailDir),
     ];
 
     public IReadOnlyList<CleanupScan> Scan() => Targets.Select(ScanOne).ToList();
@@ -184,7 +183,7 @@ public sealed class CleanupService(ICleanupSystem system, IActionLog log, Cleanu
                 skipped++; // fichier verrouillé ou protégé : ignoré
             }
         }
-        if (t.Kind != CleanupKind.Thumbnails && t.Folder is not null) RemoveEmptyDirectories(t.Folder);
+        if (t.Folder is not null) RemoveEmptyDirectories(t.Folder);
         return new(t, freed, deleted, skipped, null);
     }
 
@@ -192,8 +191,6 @@ public sealed class CleanupService(ICleanupSystem system, IActionLog log, Cleanu
     private IEnumerable<FileInfo> Files(CleanupTarget t)
     {
         if (t.Folder is null || !Directory.Exists(t.Folder)) return [];
-        if (t.Kind == CleanupKind.Thumbnails)
-            return new DirectoryInfo(t.Folder).EnumerateFiles("thumbcache_*.db", SearchOption.TopDirectoryOnly);
 
         var minAge = t.Kind == CleanupKind.Folder ? TempMinAge : TimeSpan.Zero;
         var limit = _utcNow() - minAge;

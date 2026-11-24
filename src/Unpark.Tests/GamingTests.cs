@@ -40,7 +40,7 @@ public class GamingTests : IDisposable
         _backup = new BackupStore(Path.Combine(_dir.Path, "backup.json"), _log);
         _ui = new FakeSystemUi(_reg);
         _ui.SetMouse(new MouseParams(6, 10, 1)); // réglage Windows par défaut : accélération activée
-        _settings = GamingSettings.Create(new SettingContext(_reg, _backup, _log), _ui);
+        _settings = GamingSettings.Create(new SettingContext(_reg, _backup, _log), _ui, windowsBuild: 26200);
     }
 
     public void Dispose() => _dir.Dispose();
@@ -58,7 +58,6 @@ public class GamingTests : IDisposable
         foreach (var s in _settings) { s.Apply(); Assert.True(s.IsApplied(), s.Name); }
         Assert.Equal(RegValue.DWord(2), _reg.Get(hags));
         Assert.Equal(new MouseParams(0, 0, 0), _ui.GetMouse());
-        Assert.All(_ui.Effects.Values, Assert.False);
 
         foreach (var s in _settings.Reverse()) s.Revert();
         Assert.Equal(snapshot.OrderBy(k => k.Key.ToString()).Select(k => (k.Key, k.Value.ToString())),
@@ -85,14 +84,63 @@ public class GamingTests : IDisposable
     }
 
     [Fact]
-    public void Apercu_des_effets_avant_application()
+    public void Effets_visuels_retires_mais_encore_annulables()
     {
-        var fx = (VisualEffectsSetting)Get(GamingSettings.VisualFxId);
-        _ui.Effects[0x1003] = false;
-        var preview = fx.Preview();
-        Assert.Equal(VisualEffectsSetting.Effects.Count, preview.Count);
-        Assert.Contains(preview, p => p.Effect.SetAction == 0x1003 && !p.On);
-        Assert.Contains(preview, p => p.Effect.SetAction == 0x1043 && p.On);
+        Assert.DoesNotContain(_settings, s => s.Id == GamingSettings.VisualFxId);
+        var ctx = new SettingContext(_reg, _backup, _log);
+        var legacy = GamingSettings.Legacy(ctx, _ui).Single();
+        legacy.Apply();                                   // appliqué avec une ancienne version d'Unpark
+        Assert.All(_ui.Effects.Values, Assert.False);
+        var engine = new SettingsEngine(ctx, [.. _settings, .. GamingSettings.Legacy(ctx, _ui)], () => DateTime.MinValue);
+        Assert.All(engine.RevertAll(), r => Assert.True(r.Success));
+        Assert.All(_ui.Effects.Values, Assert.True);
+    }
+
+    [Fact]
+    public void Jeux_en_fenetre_garde_les_autres_reglages_DirectX()
+    {
+        _reg.Values[WindowedGamesSetting.ValuePath] = RegValue.String("AutoHDREnable=1;VRROptimizeEnable=0;");
+        var s = Get(GamingSettings.WindowedGamesId);
+        Assert.False(s.IsApplied());
+        s.Apply();
+        Assert.Equal("AutoHDREnable=1;VRROptimizeEnable=0;SwapEffectUpgradeEnable=1;", _reg.Get(WindowedGamesSetting.ValuePath)!.Text);
+        s.Revert();
+        Assert.Equal("AutoHDREnable=1;VRROptimizeEnable=0;", _reg.Get(WindowedGamesSetting.ValuePath)!.Text);
+    }
+
+    [Fact]
+    public void Jeux_en_fenetre_indisponible_sur_Windows_10()
+    {
+        var ctx = new SettingContext(_reg, _backup, _log);
+        var win10 = GamingSettings.Create(ctx, _ui, windowsBuild: 19045).Single(s => s.Id == GamingSettings.WindowedGamesId);
+        Assert.NotNull(((IConditionalSetting)win10).UnavailableReason());
+        var result = new SettingsEngine(ctx, [win10], () => DateTime.MinValue).Apply(win10);
+        Assert.False(result.Success);
+        Assert.Null(_reg.Get(WindowedGamesSetting.ValuePath));
+    }
+
+    [Fact]
+    public void Integrite_de_la_memoire_avertissement_redemarrage_et_verrous()
+    {
+        var hvci = Get(GamingSettings.MemoryIntegrityId);
+        Assert.True(hvci.RequiresRestart);
+        Assert.Contains("sécurité", ((IWarnedSetting)hvci).Warning);
+
+        _reg.Values[MemoryIntegritySetting.EnabledPath] = RegValue.DWord(1);
+        Assert.False(hvci.IsApplied());
+        hvci.Apply();
+        Assert.Equal(RegValue.DWord(0), _reg.Get(MemoryIntegritySetting.EnabledPath));
+        hvci.Revert();
+        Assert.Equal(RegValue.DWord(1), _reg.Get(MemoryIntegritySetting.EnabledPath));
+
+        _reg.Values[MemoryIntegritySetting.LockedPath] = RegValue.DWord(1);
+        Assert.Contains("Verrouillée", ((IConditionalSetting)hvci).UnavailableReason());
+        Assert.Throws<InvalidOperationException>(hvci.Apply);
+        Assert.Equal(RegValue.DWord(1), _reg.Get(MemoryIntegritySetting.EnabledPath));
+
+        _reg.Values.Remove(MemoryIntegritySetting.LockedPath);
+        _reg.Values[MemoryIntegritySetting.PolicyPath] = RegValue.DWord(2);
+        Assert.Contains("stratégie", ((IConditionalSetting)hvci).UnavailableReason());
     }
 }
 

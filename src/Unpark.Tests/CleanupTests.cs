@@ -33,7 +33,7 @@ public class CleanupTests : IDisposable
     public CleanupTests()
     {
         string D(string n) => Directory.CreateDirectory(Path.Combine(_dir.Path, n)).FullName;
-        _paths = new CleanupPaths(D("temp"), D("wintemp"), D("wu"), D("explorer"));
+        _paths = new CleanupPaths(D("temp"), D("wintemp"), D("wu"));
     }
 
     public void Dispose()
@@ -124,14 +124,11 @@ public class CleanupTests : IDisposable
     }
 
     [Fact]
-    public void Corbeille_et_miniatures()
+    public void Corbeille_et_plus_de_cache_des_miniatures()
     {
-        Write("explorer/thumbcache_256.db", 300, TimeSpan.Zero);
-        var other = Write("explorer/autre.db", 300, TimeSpan.Zero);
         var results = Service().Clean(["recycle", "thumbs"]);
         Assert.Equal(5000, results.Single(r => r.Target.Id == "recycle").FreedBytes);
-        Assert.Equal(300, results.Single(r => r.Target.Id == "thumbs").FreedBytes);
-        Assert.True(File.Exists(other));
+        Assert.DoesNotContain(Service().Targets, t => t.Id == "thumbs");   // retiré après l'audit
     }
 
     [Theory]

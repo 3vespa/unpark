@@ -19,20 +19,8 @@
                 <TextBlock Text="{Binding Description}" Style="{StaticResource DimText}" Margin="0,4,0,0" />
                 <TextBlock Text="{Binding Note}" Style="{StaticResource BodyText}" Foreground="{StaticResource WarnBrush}" FontSize="12" Margin="0,4,0,0"
                            Visibility="{Binding Note, Converter={StaticResource NullToCollapsed}}" />
-                <Expander Header="Voir ce qui change" Foreground="{StaticResource TextDimBrush}" Margin="0,8,0,0"
-                          Visibility="{Binding HasPreview, Converter={StaticResource BoolToVis}}">
-                    <ItemsControl ItemsSource="{Binding Preview}" Margin="18,6,0,0">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Style="{StaticResource DimText}" FontSize="12" Margin="0,1">
-                                    <Run Text="{Binding Label, Mode=OneWay}" Foreground="{StaticResource TextBrush}" />
-                                    <Run Text=" : " />
-                                    <Run Text="{Binding State, Mode=OneWay}" />
-                                </TextBlock>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Expander>
+                <TextBlock Text="{Binding UnavailableReason}" Style="{StaticResource BodyText}" Foreground="{StaticResource InfoBrush}" FontSize="12" Margin="0,4,0,0"
+                           Visibility="{Binding UnavailableReason, Converter={StaticResource NullToCollapsed}}" />
             </StackPanel>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" MinWidth="170">
                 <TextBlock Text="{Binding StatusText}" FontSize="12" HorizontalAlignment="Right" Margin="0,0,0,8">
@@ -48,7 +36,8 @@
                     </TextBlock.Style>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Appliquer" Style="{StaticResource AccentButton}" Command="{Binding ApplyCommand}" Padding="14,8" Margin="0,0,8,0" />
+                    <Button Content="Appliquer" Style="{StaticResource AccentButton}" Command="{Binding ApplyCommand}" Padding="14,8" Margin="0,0,8,0"
+                            IsEnabled="{Binding IsAvailable}" />
                     <Button Content="Annuler" Command="{Binding RevertCommand}" Padding="14,8" IsEnabled="{Binding HasBackup}" />
                 </StackPanel>
             </StackPanel>

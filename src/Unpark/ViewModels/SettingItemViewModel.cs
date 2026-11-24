@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Unpark.Core.Gaming;
@@ -6,9 +5,6 @@ using Unpark.Core.Settings;
 using Unpark.Services;
 
 namespace Unpark.ViewModels;
-
-/// <summary>Une ligne d'aperçu (ex. un effet visuel et son état actuel).</summary>
-public sealed record PreviewRow(string Label, string State);
 
 /// <summary>Carte d'un réglage réversible : état, badges, boutons Appliquer / Annuler.</summary>
 public sealed partial class SettingItemViewModel : ObservableObject
@@ -29,8 +25,10 @@ public sealed partial class SettingItemViewModel : ObservableObject
     /// <summary>Remarque affichée en orange (ex. conseil HAGS selon la carte graphique).</summary>
     [ObservableProperty] private string? _note;
 
-    public ObservableCollection<PreviewRow> Preview { get; } = [];
-    public bool HasPreview => Setting is VisualEffectsSetting;
+    /// <summary>Raison si le réglage n'existe pas sur ce PC (version de Windows, verrou…), sinon null.</summary>
+    [ObservableProperty] private string? _unavailableReason;
+    public bool IsAvailable => UnavailableReason is null;
+    partial void OnUnavailableReasonChanged(string? value) => OnPropertyChanged(nameof(IsAvailable));
 
     [ObservableProperty] private string _statusText = "";
     [ObservableProperty] private bool _isApplied;
@@ -46,12 +44,8 @@ public sealed partial class SettingItemViewModel : ObservableObject
                 : IsApplied ? "Déjà réglé ainsi sur ce PC"
                 : HasBackup ? "Modifié depuis (ré-appliquer ou annuler)"
                 : "Pas appliqué";
-            if (Setting is VisualEffectsSetting fx)
-            {
-                Preview.Clear();
-                foreach (var (effect, on) in fx.Preview())
-                    Preview.Add(new PreviewRow(effect.Label, on ? "activé → sera désactivé" : "déjà désactivé"));
-            }
+            UnavailableReason = (Setting as IConditionalSetting)?.UnavailableReason();
+            if (UnavailableReason is not null && !HasBackup) StatusText = "Indisponible sur ce PC";
         }
         catch (Exception e)
         {

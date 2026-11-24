@@ -37,7 +37,7 @@ public sealed class UnparkPowerPlan(SettingContext ctx, IPowerApi power, IComman
 
     public string Id => SettingId;
     public string Name => "Plan d'alimentation Unpark Performance";
-    public string Description => "Cœurs toujours actifs, processeur à 100 %, boost agressif, pas de mise en veille sur secteur.";
+    public string Description => "Gain réel mais modeste : surtout de meilleurs 1 % low dans les jeux limités par le processeur ; souvent nul si la carte graphique limite.";
     public bool RequiresRestart => false;
 
     private static Guid U => PowerSettings.Unpark;

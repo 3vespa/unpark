@@ -4,7 +4,7 @@
     <StackPanel>
         <TextBlock Text="Gaming en 1 clic" Style="{StaticResource TitleText}" />
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
-                   Text="Applique d'un coup le plan Unpark Performance et les réglages Gaming, puis propose un nettoyage. Un récapitulatif s'affiche avant de valider." />
+                   Text="Applique d'un coup le plan Unpark Performance et les réglages Gaming à l'effet reconnu, puis propose un nettoyage (espace disque). Un récapitulatif s'affiche avant de valider." />
 
         <!-- Avertissement portable -->
         <Border Style="{StaticResource Card}" Margin="0,16,0,0" BorderBrush="{StaticResource WarnBrush}"

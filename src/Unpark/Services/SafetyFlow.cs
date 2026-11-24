@@ -1,3 +1,4 @@
+using Unpark.Core.Gaming;
 using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
 
@@ -67,8 +68,20 @@ public static class SafetyFlow
         }
     }
 
+    /// <summary>Réglage indisponible sur ce PC, ou avertissement refusé : false = ne rien faire.</summary>
+    private static bool CanApply(ISetting setting)
+    {
+        if (setting is IConditionalSetting c && c.UnavailableReason() is { } reason)
+        {
+            Dialogs.Info($"« {setting.Name} » : {reason}");
+            return false;
+        }
+        return setting is not IWarnedSetting w || Dialogs.Confirm(w.Warning);
+    }
+
     public static async Task ApplyAsync(ISetting setting)
     {
+        if (!CanApply(setting)) return;
         if (!await BeforeFirstChangeAsync()) return;
         var result = await S.RunBusyAsync($"Application : {setting.Name}…", () => S.Engine.Apply(setting));
         S.NotifyChanged();
@@ -78,6 +91,7 @@ public static class SafetyFlow
     /// <summary>Applique plusieurs réglages à la suite (point de restauration proposé une seule fois), puis affiche un récapitulatif.</summary>
     public static async Task<IReadOnlyList<OperationResult>> ApplyManyAsync(IReadOnlyList<ISetting> settings, bool showSummary = true)
     {
+        settings = settings.Where(CanApply).ToList();
         if (settings.Count == 0 || !await BeforeFirstChangeAsync()) return [];
         var results = await S.RunBusyAsync($"Application de {settings.Count} réglage(s)…",
             () => settings.Select(s => S.Engine.Apply(s)).ToList());

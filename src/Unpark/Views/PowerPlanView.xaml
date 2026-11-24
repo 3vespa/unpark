@@ -4,7 +4,7 @@
     <StackPanel>
         <TextBlock Text="Plan d'alimentation" Style="{StaticResource TitleText}" />
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
-                   Text="« Unpark Performance » garde tous les cœurs du processeur actifs et à pleine vitesse : moins de saccades et de micro-latences en jeu." />
+                   Text="« Unpark Performance » garde tous les cœurs du processeur actifs et prêts à pleine vitesse. Gain réel mais modeste : surtout de meilleurs 1 % low dans les jeux limités par le processeur ; souvent nul si c'est la carte graphique qui limite." />
 
         <!-- Erreur de lecture -->
         <Border Style="{StaticResource Card}" Margin="0,16,0,0" BorderBrush="{StaticResource DangerBrush}"

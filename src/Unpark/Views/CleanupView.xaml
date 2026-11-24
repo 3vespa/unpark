@@ -4,7 +4,7 @@
     <StackPanel>
         <TextBlock Text="Nettoyage" Style="{StaticResource TitleText}" />
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
-                   Text="Supprime les fichiers inutiles. Les fichiers en cours d'utilisation sont ignorés, et les fichiers temporaires de moins de 2 heures sont épargnés (installation en cours)." />
+                   Text="Libère de l'espace disque, sans effet sur les FPS (utile surtout si le disque est presque plein). Les fichiers en cours d'utilisation sont ignorés, et les fichiers temporaires de moins de 2 heures sont épargnés (installation en cours)." />
 
         <WrapPanel Margin="0,20,0,0">
             <Button Content="Analyser" Command="{Binding AnalyzeCommand}" Margin="0,0,10,0" />

@@ -7,7 +7,7 @@
             <TextBlock Text="Démarrage" Style="{StaticResource TitleText}" />
         </DockPanel>
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
-                   Text="Moins de programmes au démarrage = Windows prêt plus vite et moins de choses en arrière-plan pendant le jeu. Désactiver ne supprime rien : comme dans le Gestionnaire des tâches, le programme ne se lance simplement plus tout seul." />
+                   Text="Windows démarre plus vite. En jeu, utile seulement si ces programmes consomment en fond (logiciels RGB, lanceurs…). Désactiver ne supprime rien : comme dans le Gestionnaire des tâches, le programme ne se lance simplement plus tout seul." />
         <TextBlock Text="{Binding Summary}" Style="{StaticResource BodyText}" Margin="0,16,0,12" />
         <ItemsControl ItemsSource="{Binding Rows}">
             <ItemsControl.ItemTemplate>

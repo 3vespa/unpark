@@ -9,7 +9,7 @@
             <TextBlock Text="Gaming" Style="{StaticResource TitleText}" />
         </DockPanel>
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,20"
-                   Text="Réglages Windows utiles en jeu. Chaque réglage s'annule séparément, ou tous ensemble avec « Tout annuler » sur l'accueil." />
+                   Text="Seulement des réglages à l'effet reconnu, chacun optionnel, avec ce qu'il apporte vraiment. Chaque réglage s'annule séparément, ou tous ensemble avec « Tout annuler » sur l'accueil." />
         <ItemsControl ItemsSource="{Binding Items}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>

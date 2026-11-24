@@ -32,11 +32,13 @@ public sealed class AppServices
         Commands = new ProcessCommandRunner();
         Power = new WindowsPowerApi();
         PowerPlan = new UnparkPowerPlan(Context, Power, Commands);
-        Gaming = GamingSettings.Create(Context, new WindowsSystemUiApi());
+        var systemUi = new WindowsSystemUiApi();
+        Gaming = GamingSettings.Create(Context, systemUi, WindowsVersionInfo.Read(Registry).Build);
+        var legacy = GamingSettings.Legacy(Context, systemUi);
         Cleanup = new CleanupService(new WindowsCleanupSystem(), Log, CleanupPaths.Default);
         Debloat = new DebloatService(new WindowsAppxApi(), Log, Paths.DebloatHistoryFile);
         Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
-        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
+        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
         SystemInfo = new SystemInfoService(new WmiHardwareInfoApi(), Registry, Power, Startup);
         Diagnostics = new WindowsDiagnostics(Registry, Power, Startup, Commands, Log);
         _hags = new Lazy<Task<HagsAdvice>>(() => Task.Run(() =>

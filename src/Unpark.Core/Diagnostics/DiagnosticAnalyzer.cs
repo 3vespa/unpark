@@ -271,7 +271,8 @@ public static class DiagnosticAnalyzer
         if (w.MemoryIntegrity is { } hvci)
             checks.Add(new("Intégrité de la mémoire", DiagStatus.Info, hvci ? "Activée" : "Désactivée",
                 hvci ? "Protection de sécurité active. Elle peut coûter quelques % de performances dans certains jeux ; à toi de choisir entre sécurité et FPS."
-                     : "Désactivée : un peu plus de performances, mais moins de protection contre les logiciels malveillants."));
+                     : "Désactivée : un peu plus de performances, mais moins de protection contre les logiciels malveillants.",
+                hvci ? DiagFix.Gaming : DiagFix.None));
 
         checks.Add(w.StartupEnabled > 20
             ? new("Programmes au démarrage", DiagStatus.Red, $"{w.StartupEnabled} activés", "Beaucoup de programmes se lancent avec Windows et tournent en fond : désactive ceux dont tu n'as pas besoin.", DiagFix.Startup)

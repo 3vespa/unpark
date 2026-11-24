@@ -49,10 +49,12 @@ public sealed partial class OneClickViewModel : PageViewModel
     public OneClickViewModel() : base("Gaming en 1 clic", "")
     {
         Items.Add(new OneClickItemViewModel(S.PowerPlan, true, null));
-        foreach (var s in S.Gaming)
-            // HAGS : jamais coché d'office ; coché seulement si la carte est une RTX 40/50 (voir LoadHagsAdviceAsync).
-            Items.Add(new OneClickItemViewModel(s, s.Id != GamingSettings.VisualFxId && s.Id != GamingSettings.HagsId,
-                s.Id == GamingSettings.VisualFxId ? "Optionnel : coche-le si ton PC est modeste." : null));
+        // Intégrité de la mémoire exclue (compromis de sécurité : seulement depuis la page Gaming, avec avertissement).
+        // HAGS jamais coché d'office : coché seulement sur RTX 40/50 (voir LoadHagsAdviceAsync). Souris décochée : confort, pas performances.
+        foreach (var s in S.Gaming.Where(s => s.Id != GamingSettings.MemoryIntegrityId)
+                                  .Where(s => s is not IConditionalSetting c || c.UnavailableReason() is null))
+            Items.Add(new OneClickItemViewModel(s, s.Id is not (GamingSettings.HagsId or GamingSettings.MouseId),
+                s.Id == GamingSettings.MouseId ? "Optionnel : aucun effet sur les FPS, rend seulement la visée constante." : null));
         S.StateChanged += Refresh;
         Refresh();
         _ = DetectLaptopAsync();

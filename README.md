@@ -32,14 +32,24 @@ Fonctionne sur **Windows 10 (22H2)** et **Windows 11**. Rien à installer : c'es
 
 | Page | Ce qu'elle fait | Annulable ? |
 | --- | --- | --- |
-| **Plan d'alimentation** | Crée le plan « Unpark Performance » : tous les cœurs du processeur actifs et à 100 %, boost agressif, pas de mise en veille sur secteur. Sur portable, réglages agressifs sur secteur seulement. | ✅ « Revenir à mon ancien plan » ou « Supprimer le plan Unpark » |
-| **Gaming** | Mode Jeu, planification GPU (HAGS, redémarrage requis), captures Game DVR coupées, accélération de la souris désactivée, effets visuels sur « performances » (optionnel). | ✅ bouton « Annuler » sur chaque réglage |
-| **Démarrage** | Active / désactive les programmes lancés avec Windows, comme le Gestionnaire des tâches (rien n'est supprimé). | ✅ réactiver remet l'état d'origine |
-| **Nettoyage** | Fichiers temporaires, cache de Windows Update, miniatures, corbeille (décochée par défaut). | ❌ fichiers supprimés pour de bon |
-| **Debloat** | Retire des applis préinstallées inutiles (liste sûre cochée par défaut). Le Store, la Calculatrice, Photos, le Terminal et les applis Xbox ne sont jamais proposés. | ⚠️ réinstallation depuis le Microsoft Store (bouton dans la page) |
-| **Infos système** | Processeur, carte graphique, mémoire, disques, version de Windows… Bouton **« Copier le résumé »** à coller sur Discord si tu as besoin d'aide. | — |
+Unpark ne garde que des réglages à l'effet reconnu, et dit honnêtement ce que chacun apporte. Tout est optionnel.
 
-Ce qu'Unpark ne fait **jamais** : désactiver Windows Defender, le pare-feu ou Windows Update, « nettoyer la RAM », ou toucher à des réglages non documentés impossibles à annuler.
+| Réglage | Ce qu'il apporte vraiment | Annulable ? |
+| --- | --- | --- |
+| **Plan d'alimentation Unpark Performance** | Gain réel mais modeste : surtout de meilleurs 1 % low dans les jeux limités par le processeur ; souvent nul si la carte graphique limite. Sur portable, seulement sur secteur. | ✅ « Revenir à mon ancien plan » ou « Supprimer le plan Unpark » |
+| **Mode Jeu** | Priorité au jeu, pas de mises à jour installées pendant la partie. Effet faible mais réel. | ✅ |
+| **Enregistrement en arrière-plan (Game Bar)** | Quelques % de FPS récupérés s'il était actif, rien sinon. | ✅ |
+| **Optimisations pour les jeux en fenêtre** (Windows 11) | Latence plus basse en fenêtre sans bordure, Auto HDR et VRR en fenêtré. | ✅ |
+| **HAGS** | Nécessaire pour DLSS Frame Generation (RTX 40/50, recommandé seulement là). Ailleurs, effet quasi nul et peut réserver de la mémoire vidéo sur les cartes de 6-8 Go. Redémarrage requis. | ✅ |
+| **Accélération de la souris désactivée** | Aucun gain de FPS : rend la visée constante. | ✅ |
+| **Intégrité de la mémoire désactivée** | 0 à ~10 % selon le processeur et le jeu, **mais moins de sécurité**. Jamais dans le profil 1 clic, avertissement avant. Redémarrage requis. | ✅ |
+| **Démarrage** | Windows démarre plus vite ; en jeu, utile seulement si ces programmes consomment en fond. | ✅ réactiver remet l'état d'origine |
+| **Nettoyage** | Espace disque uniquement, aucun effet sur les FPS (corbeille décochée par défaut). | ❌ fichiers supprimés pour de bon |
+| **Debloat** | Rangement : quasi aucun effet sur les FPS. Le Store, la Calculatrice, Photos, le Terminal et les applis Xbox ne sont jamais proposés. | ⚠️ réinstallation depuis le Microsoft Store (bouton dans la page) |
+| **Diagnostic** | Lecture seule : RAM (XMP/EXPO, double canal), fréquence de l'écran, pilote graphique, erreurs, disques, réseau… avec un bouton vers la correction. **« Copier le rapport »** pour Discord. | — |
+| **Infos système** | Processeur, carte graphique, mémoire, disques… Bouton **« Copier le résumé »**. | — |
+
+Ce qu'Unpark ne fait **jamais**, parce que c'est inutile ou risqué : désactiver Windows Defender, le pare-feu ou Windows Update, « nettoyer la RAM », réglages réseau du registre « anti-ping », désactivation de services au hasard, commandes bcdedit (HPET, dynamic tick…), résolution de la minuterie, effets visuels « performances » (aucun effet en jeu).
 
 ## 4. Tout annuler
 
