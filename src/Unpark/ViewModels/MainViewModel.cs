@@ -20,7 +20,7 @@ public sealed partial class MainViewModel : ObservableObject
             new StartupViewModel(),
             new CleanupViewModel(),
             new DebloatViewModel(),
-            new PlaceholderViewModel("Infos système", "", "Processeur, carte graphique, mémoire, disques, version de Windows, plan d'alimentation actif."),
+            new InfoViewModel(),
         ];
         _selectedPage = Pages[0];
 
