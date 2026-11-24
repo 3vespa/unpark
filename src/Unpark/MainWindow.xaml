@@ -19,9 +19,12 @@
         <!-- Menu de gauche -->
         <Border Grid.Column="0" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
             <DockPanel Margin="16,24,16,16">
-                <StackPanel DockPanel.Dock="Top" Margin="8,0,0,24">
-                    <TextBlock Text="{Binding AppName}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
-                    <TextBlock Text="{Binding Subtitle}" FontSize="13" Foreground="{StaticResource TextDimBrush}" Margin="0,2,0,0" />
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="6,0,0,24">
+                    <ContentControl Content="{StaticResource LogoTemplate}" Width="44" Height="44" VerticalAlignment="Center" Margin="0,0,12,0" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding AppName}" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource TextDimBrush}" Margin="0,1,0,0" />
+                    </StackPanel>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Bottom" Text="{Binding Version}" Margin="8,12,0,0" FontSize="12" Foreground="{StaticResource TextDimBrush}" />
                 <ListBox ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}"

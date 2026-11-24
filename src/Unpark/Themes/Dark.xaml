@@ -32,6 +32,18 @@
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     <conv:NullToCollapsedConverter x:Key="NullToCollapsed" />
 
+    <!-- Logo (vectoriel, 100×100 comme le SVG d'origine) -->
+    <Viewbox x:Key="LogoTemplate" x:Shared="False" Width="40" Height="40">
+        <Canvas Width="100" Height="100">
+            <Rectangle Canvas.Left="55" Canvas.Top="17" Width="28" Height="28" RadiusX="7" RadiusY="7"
+                       Stroke="#3DDC97" StrokeThickness="2" Opacity="0.35" />
+            <Rectangle Canvas.Left="16" Canvas.Top="54" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
+            <Rectangle Canvas.Left="54" Canvas.Top="54" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
+            <Rectangle Canvas.Left="16" Canvas.Top="16" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
+            <Rectangle Canvas.Left="62" Canvas.Top="8" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#FFFFFF" />
+        </Canvas>
+    </Viewbox>
+
     <!-- Textes -->
     <Style x:Key="TitleText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="26" />

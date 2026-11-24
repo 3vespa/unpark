@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unpark — Optimisation PC gaming</title>
+  <meta name="description" content="Unpark : les réglages Windows qui comptent vraiment pour le jeu, et rien d'autre. Tout est optionnel, tout s'annule. Gratuit, pour Windows 10 et 11.">
+  <meta name="theme-color" content="#0F1115">
+  <meta property="og:title" content="Unpark — Optimisation PC gaming">
+  <meta property="og:description" content="Les réglages Windows qui comptent vraiment pour le jeu, et rien d'autre. Tout est optionnel, tout s'annule.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/fonts/SpaceGrotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#accueil" aria-label="Unpark, accueil">
+        <img src="/logo.svg" alt="" width="34" height="34">
+        <span>Unpark</span>
+      </a>
+      <nav aria-label="Navigation principale">
+        <a href="#a-propos">À propos</a>
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a class="nav-cta" href="#telechargement">Télécharger</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Accueil -->
+    <section id="accueil" class="hero">
+      <div class="wrap">
+        <img class="hero-logo" src="/logo.svg" alt="Logo Unpark" width="112" height="112">
+        <h1>Unpark <span class="dash">—</span> <span class="accent">Optimisation PC gaming</span></h1>
+        <p class="lead">Les réglages Windows qui comptent vraiment pour le jeu, et rien d'autre. Pas de promesse de +50&nbsp;FPS : tout est optionnel, tout s'annule en un clic.</p>
+        <a class="btn btn-big" href="https://github.com/TON-PSEUDO/unpark/releases/download/v0.9.0/Unpark-v0.9.0.exe" data-r-href="url">
+          Télécharger <span class="btn-sub">v<span data-r="version">0.9.0</span> · Windows 10 et 11 · gratuit</span>
+        </a>
+        <p class="hero-note">Un seul fichier, rien à installer.</p>
+      </div>
+    </section>
+
+    <!-- À propos -->
+    <section id="a-propos" class="section">
+      <div class="wrap">
+        <h2>À propos</h2>
+        <p class="intro">Unpark est un projet perso, fait par un joueur pour ses potes. Le but : regrouper dans une seule appli les réglages Windows qui ont un effet réel en jeu, dire honnêtement ce que chacun apporte, et ne jamais rien casser.</p>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3>Les principes</h3>
+            <ul class="checks">
+              <li><strong>Que des réglages utiles.</strong> Chacun a un effet reconnu, et l'appli dit ce qu'il apporte vraiment, même quand c'est peu.</li>
+              <li><strong>Tout est optionnel.</strong> Rien n'est appliqué sans ton accord, et chaque réglage se choisit séparément.</li>
+              <li><strong>Tout s'annule.</strong> La valeur d'origine est sauvegardée avant chaque modification : « Tout annuler » remet ton PC exactement comme avant.</li>
+              <li><strong>Point de restauration.</strong> Proposé avant la première modification, pour pouvoir revenir en arrière même si Unpark ne s'ouvre plus.</li>
+              <li><strong>Transparent.</strong> Chaque action est notée dans un journal. Aucune pub, aucune collecte de données.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Ce qu'Unpark refuse de faire</h3>
+            <p class="muted">Des « astuces » qui circulent partout, mais inutiles ou risquées :</p>
+            <ul class="crosses">
+              <li>Les « nettoyeurs de RAM » (Windows gère très bien sa mémoire)</li>
+              <li>Les réglages réseau du registre censés baisser le ping</li>
+              <li>La désactivation de services Windows au hasard</li>
+              <li>Les commandes bcdedit (HPET, useplatformclock, dynamic tick)</li>
+              <li>La « résolution de la minuterie »</li>
+              <li>Les effets visuels « performances » (aucun effet en jeu)</li>
+              <li>Désactiver Windows Defender, le pare-feu ou Windows Update</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fonctionnalités -->
+    <section id="fonctionnalites" class="section">
+      <div class="wrap">
+        <h2>Fonctionnalités</h2>
+        <p class="intro">Une page par sujet dans l'appli. Pour chacune, ce qu'elle apporte <em>vraiment</em>.</p>
+        <div class="grid grid-3">
+          <article class="card feature">
+            <h3>Diagnostic</h3>
+            <p>En 40 secondes et sans rien modifier : RAM (XMP/EXPO, double canal), fréquence de l'écran, pilote graphique, erreurs matérielles, disques, réseau. Repère les vrais freins, comme un écran 144&nbsp;Hz réglé à 60&nbsp;Hz.</p>
+            <p class="gain">Le plus utile pour commencer.</p>
+          </article>
+          <article class="card feature">
+            <h3>Gaming en 1 clic</h3>
+            <p>Applique d'un coup le plan d'alimentation et les réglages Gaming recommandés, avec un récapitulatif avant de valider et un bouton « Tout annuler ».</p>
+            <p class="gain">Le raccourci, tout reste annulable.</p>
+          </article>
+          <article class="card feature">
+            <h3>Plan d'alimentation</h3>
+            <p>Le plan « Unpark Performance » garde tous les cœurs du processeur actifs et prêts à pleine vitesse. Sur portable, seulement sur secteur.</p>
+            <p class="gain">Gain réel mais modeste : surtout les 1&nbsp;% low dans les jeux limités par le processeur.</p>
+          </article>
+          <article class="card feature">
+            <h3>Mode dynamique</h3>
+            <p>Une icône près de l'horloge : plan Performance quand tu utilises le PC, Équilibré après quelques minutes d'inactivité.</p>
+            <p class="gain">Moins de chaleur et de bruit au repos, mêmes performances en jeu.</p>
+          </article>
+          <article class="card feature">
+            <h3>Gaming</h3>
+            <p>Mode Jeu, enregistrement en arrière-plan de la Game Bar, optimisations des jeux en fenêtre (Windows 11), HAGS (recommandé seulement sur RTX&nbsp;40/50), accélération de la souris, Intégrité de la mémoire (avec avertissement).</p>
+            <p class="gain">Chaque réglage dit son effet réel, souvent faible mais mesurable.</p>
+          </article>
+          <article class="card feature">
+            <h3>Démarrage</h3>
+            <p>Active ou désactive les programmes lancés avec Windows, comme le Gestionnaire des tâches. Rien n'est supprimé.</p>
+            <p class="gain">Démarrage plus rapide ; en jeu, utile si ces programmes tournent en fond.</p>
+          </article>
+          <article class="card feature">
+            <h3>Nettoyage</h3>
+            <p>Fichiers temporaires, cache de Windows Update, corbeille. L'espace récupérable s'affiche avant, l'espace gagné après.</p>
+            <p class="gain">De l'espace disque, aucun effet sur les FPS.</p>
+          </article>
+          <article class="card feature">
+            <h3>Debloat</h3>
+            <p>Retire les applis préinstallées inutiles, avec une liste sûre cochée par défaut. Le Store, la Calculatrice, Photos et les applis Xbox ne sont jamais proposés.</p>
+            <p class="gain">Du rangement, quasi aucun effet sur les FPS.</p>
+          </article>
+          <article class="card feature">
+            <h3>Infos système</h3>
+            <p>Processeur, carte graphique, mémoire, disques, version de Windows. Un bouton copie le résumé pour demander de l'aide sur Discord.</p>
+            <p class="gain">Pour savoir ce qu'il y a dans ton PC.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Téléchargement -->
+    <section id="telechargement" class="section">
+      <div class="wrap">
+        <h2>Téléchargement</h2>
+        <div class="grid grid-2">
+          <div class="card download">
+            <h3>Unpark v<span data-r="version">0.9.0</span></h3>
+            <dl class="facts">
+              <dt>Taille</dt><dd data-r="size">70 Mo</dd>
+              <dt>Date</dt><dd data-r="date">24 novembre 2026</dd>
+              <dt>Configuration</dt><dd>Windows 10 (22H2) ou Windows 11, 64 bits</dd>
+              <dt>SHA-256</dt><dd><code data-r="sha256">d33e5c92569070e9bb0186b78c7c2c55fbe21a4a5d9aa0b7b6bfcec4150c2c34</code></dd>
+            </dl>
+            <a class="btn" href="https://github.com/TON-PSEUDO/unpark/releases/download/v0.9.0/Unpark-v0.9.0.exe" data-r-href="url">Télécharger l'exe</a>
+            <a class="link" href="https://github.com/TON-PSEUDO/unpark/releases/latest" data-r-href="latest">Toutes les versions sur GitHub</a>
+          </div>
+          <div class="card">
+            <h3>Windows affiche une alerte bleue ?</h3>
+            <p>C'est normal : Unpark n'est pas <strong>signé</strong> (une signature coûte plusieurs centaines d'euros par an, pas raisonnable pour un projet entre potes). Windows SmartScreen prévient alors pour toute appli peu téléchargée.</p>
+            <ol class="steps">
+              <li>Clique sur <strong>« Informations complémentaires »</strong>.</li>
+              <li>Puis sur <strong>« Exécuter quand même »</strong>.</li>
+              <li>Accepte la demande d'autorisation administrateur : Unpark en a besoin pour modifier les réglages de Windows.</li>
+            </ol>
+            <p class="muted">Pour vérifier que le fichier n'a pas été modifié, compare son empreinte dans PowerShell :<br><code>Get-FileHash .\Unpark-v<span data-r="version">0.9.0</span>.exe</code></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Unpark · projet perso, gratuit, sans pub ni collecte de données.</span>
+      <span class="muted">Non affilié à Microsoft, NVIDIA, AMD ou Intel.</span>
+    </div>
+  </footer>
+</body>
+</html>

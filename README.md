@@ -98,3 +98,15 @@ src/Unpark.Core/    logique : réglages réversibles (IsApplied/Apply/Revert), s
 src/Unpark.Tests/   tests automatiques (tournent sous Linux, Windows simulé)
 releases/           exe publiés (pas dans git)
 ```
+
+### Logo, site et publication
+
+```bash
+python3 scripts/make-icons.py      # régénère les icônes (exe, favicon) à partir du logo
+./scripts/prepare-release.sh       # met le site à jour (version, taille, date, SHA-256) et écrit releases/notes-vX.Y.Z.md
+```
+
+- `site/` : site vitrine statique (HTML + CSS, aucune dépendance, police Space Grotesk hébergée sur place, licence OFL dans `site/fonts/`). Déployable tel quel sur **Cloudflare Pages** (dossier de sortie `site`, pas de commande de build).
+- L'exe (~70 Mo) va sur **GitHub Releases** : Cloudflare Pages refuse les fichiers de plus de 25 Mo.
+- `scripts/release.conf` : le dépôt GitHub des releases (`pseudo/depot`).
+- `prepare-release.sh` ne publie rien : il affiche les commandes `gh release create` et `wrangler pages deploy` à lancer soi-même.
