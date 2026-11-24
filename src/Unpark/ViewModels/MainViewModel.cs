@@ -18,7 +18,7 @@ public sealed partial class MainViewModel : ObservableObject
             new PowerPlanViewModel(),
             new GamingViewModel(),
             new StartupViewModel(),
-            new PlaceholderViewModel("Nettoyage", "", "Fichiers temporaires, cache de Windows Update, corbeille, miniatures. Espace récupérable affiché avant."),
+            new CleanupViewModel(),
             new PlaceholderViewModel("Debloat", "", "Applis préinstallées à retirer, avec une liste sûre cochée par défaut."),
             new PlaceholderViewModel("Infos système", "", "Processeur, carte graphique, mémoire, disques, version de Windows, plan d'alimentation actif."),
         ];
