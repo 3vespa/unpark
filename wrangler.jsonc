@@ -3,6 +3,10 @@
 {
   "name": "unpark",
   "compatibility_date": "2026-11-20",
+  // Adresse publique unpark.<sous-domaine>.workers.dev activée explicitement.
+  "workers_dev": true,
+  // Pas d'adresses d'aperçu par version : seul le site publié est accessible.
+  "preview_urls": false,
   "assets": {
     // Contenu publié tel quel (HTML, CSS, police, icônes). Le fichier _headers y est lu par Cloudflare, pas servi.
     "directory": "./site",
