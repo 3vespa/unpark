@@ -6,3 +6,6 @@ obj/
 # Les .exe publiés ne vont pas dans git (trop lourds) : ils sont dans releases/
 releases/
 publish/
+# Cache Python (contient des chemins locaux)
+__pycache__/
+*.pyc

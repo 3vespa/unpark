@@ -10,7 +10,8 @@ Produit :
   site/apple-touch-icon.png         180 px (écran d'accueil iPhone)
   site/logo.svg, site/favicon.svg   logo vectoriel
 
-Le premier rectangle (le contour) est retiré pour 48 px et moins : trop fin pour rester lisible.
+Le premier rectangle (le contour vert) est retiré pour 48 px et moins : trop fin pour rester lisible.
+Le carré blanc a un contour sombre (3 unités) pour rester visible sur fond clair (barre des tâches en thème clair).
 Lissage : 4×4 échantillons par pixel. Petites tailles en BMP (compatibilité maximale), 256 px en PNG.
 """
 import struct
@@ -25,12 +26,14 @@ LOGO_SVG = (
     '<rect x="16" y="54" width="30" height="30" rx="7.5" fill="#3DDC97"/>'
     '<rect x="54" y="54" width="30" height="30" rx="7.5" fill="#3DDC97"/>'
     '<rect x="16" y="16" width="30" height="30" rx="7.5" fill="#3DDC97"/>'
+    '<rect x="59" y="5" width="36" height="36" rx="10.5" fill="#0F1115"/>'
     '<rect x="62" y="8" width="30" height="30" rx="7.5" fill="#FFFFFF"/>'
     "</svg>"
 )
 
 GREEN = (0x3D, 0xDC, 0x97)
 WHITE = (0xFF, 0xFF, 0xFF)
+DARK = (0x0F, 0x11, 0x15)  # contour sombre du carré blanc : le garde visible sur une barre des tâches claire
 
 # (x, y, largeur, hauteur, rayon, couleur, opacité, épaisseur du contour ou None pour un remplissage)
 OUTLINE = (55, 17, 28, 28, 7, GREEN, 0.35, 2.0)
@@ -38,6 +41,7 @@ FILLED = [
     (16, 54, 30, 30, 7.5, GREEN, 1.0, None),
     (54, 54, 30, 30, 7.5, GREEN, 1.0, None),
     (16, 16, 30, 30, 7.5, GREEN, 1.0, None),
+    (59, 5, 36, 36, 10.5, DARK, 1.0, None),
     (62, 8, 30, 30, 7.5, WHITE, 1.0, None),
 ]
 

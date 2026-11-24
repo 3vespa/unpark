@@ -40,6 +40,7 @@
             <Rectangle Canvas.Left="16" Canvas.Top="54" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
             <Rectangle Canvas.Left="54" Canvas.Top="54" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
             <Rectangle Canvas.Left="16" Canvas.Top="16" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#3DDC97" />
+            <Rectangle Canvas.Left="59" Canvas.Top="5" Width="36" Height="36" RadiusX="10.5" RadiusY="10.5" Fill="#0F1115" />
             <Rectangle Canvas.Left="62" Canvas.Top="8" Width="30" Height="30" RadiusX="7.5" RadiusY="7.5" Fill="#FFFFFF" />
         </Canvas>
     </Viewbox>
