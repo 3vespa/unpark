@@ -5,10 +5,6 @@
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <UseWPF>true</UseWPF>
-    <!-- Seulement pour l'icône de la zone de notification (NotifyIcon) du mode dynamique. -->
-    <UseWindowsForms>true</UseWindowsForms>
-    <!-- La gestion DPI passe par app.manifest (WPF) : l'avertissement WinForms correspondant ne s'applique pas. -->
-    <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <!-- Permet de compiler une appli Windows depuis Linux. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyName>Unpark</AssemblyName>
@@ -33,11 +29,6 @@
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Pas d'espaces de noms WinForms implicites : évite les conflits avec WPF (Application, MessageBox…). -->
-    <Using Remove="System.Windows.Forms" />
-    <Using Remove="System.Drawing" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>

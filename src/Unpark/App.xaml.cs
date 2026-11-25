@@ -3,15 +3,11 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Threading;
 using Unpark.Services;
-using Unpark.Tray;
 
 namespace Unpark;
 
 public partial class App : Application
 {
-    private Mutex? _trayMutex;
-    private TrayHost? _tray;
-
     protected override void OnStartup(StartupEventArgs e)
     {
         // Interface en français (formats de nombres, dates…).
@@ -29,26 +25,13 @@ public partial class App : Application
 
         if (e.Args.Contains("--tray", StringComparer.OrdinalIgnoreCase))
         {
-            // Mode dynamique : pas de fenêtre, seulement l'icône. Une seule instance à la fois.
-            _trayMutex = new Mutex(true, TrayHost.MutexName, out var first);
-            if (!first)
-            {
-                Shutdown();
-                return;
-            }
-            ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            _tray = new TrayHost();
+            // Lancement par la tâche du mode dynamique d'une ancienne version : ce mode n'existe plus, on se ferme sans rien afficher.
+            AppServices.Current.Log.Info("Lancé avec --tray (mode dynamique d'une ancienne version, retiré en v0.9.1) : fermeture");
+            Shutdown();
             return;
         }
 
         new MainWindow().Show();
-    }
-
-    protected override void OnExit(ExitEventArgs e)
-    {
-        _tray?.Dispose();
-        _trayMutex?.Dispose();
-        base.OnExit(e);
     }
 
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

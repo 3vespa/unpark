@@ -34,9 +34,6 @@
             <DataTemplate DataType="{x:Type vm:DiagnosticViewModel}">
                 <v:DiagnosticView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:DynamicViewModel}">
-                <v:DynamicView />
-            </DataTemplate>
             <DataTemplate DataType="{x:Type vm:OneClickViewModel}">
                 <v:OneClickView />
             </DataTemplate>

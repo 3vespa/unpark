@@ -5,8 +5,8 @@ using Unpark.Core.Cleanup;
 using Unpark.Core.Commands;
 using Unpark.Core.Debloat;
 using Unpark.Core.Diagnostics;
-using Unpark.Core.Dynamic;
 using Unpark.Core.Gaming;
+using Unpark.Core.Legacy;
 using Unpark.Core.Logging;
 using Unpark.Core.Power;
 using Unpark.Core.Registry;
@@ -38,11 +38,12 @@ public sealed class AppServices
         var legacy = GamingSettings.Legacy(Context, systemUi);
         Cleanup = new CleanupService(new WindowsCleanupSystem(), Log, CleanupPaths.Default);
         Debloat = new DebloatService(new WindowsAppxApi(), Log, Paths.DebloatHistoryFile);
-        DynamicAutostart = new DynamicAutostartSetting(Context, new WindowsAutostartTask(), () => Environment.ProcessPath ?? "");
         Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
-        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy, DynamicAutostart], SettingsEngine.SystemLastBootUtc, Startup.Resolve);
+        // Mode dynamique (retiré en v0.9.1) : seulement pour que « Tout annuler » défasse ce qu'une ancienne version avait fait.
+        var legacyDynamic = new LegacyDynamicAutostart(Context, new WindowsLegacyDynamicSystem(System.IO.Path.Combine(Paths.Root, "dynamic.json")));
+        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy], SettingsEngine.SystemLastBootUtc,
+            id => id == LegacyDynamicAutostart.SettingId ? legacyDynamic : Startup.Resolve(id));
         SystemInfo = new SystemInfoService(new WmiHardwareInfoApi(), Registry, Power, Startup);
-        DynamicStore = new DynamicSettingsStore(System.IO.Path.Combine(Paths.Root, "dynamic.json"));
         Diagnostics = new WindowsDiagnostics(Registry, Power, Startup, Commands, Log);
         _hags = new Lazy<Task<HagsAdvice>>(() => Task.Run(() =>
         {
@@ -68,8 +69,6 @@ public sealed class AppServices
     public DebloatService Debloat { get; }
     public SystemInfoService SystemInfo { get; }
     public WindowsDiagnostics Diagnostics { get; }
-    public DynamicSettingsStore DynamicStore { get; }
-    public DynamicAutostartSetting DynamicAutostart { get; }
 
     private readonly Lazy<Task<HagsAdvice>> _hags;
     /// <summary>Conseil HAGS selon la carte graphique (lu une seule fois).</summary>
