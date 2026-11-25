@@ -3,6 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel>
         <TextBlock Text="Nettoyage" Style="{StaticResource TitleText}" />
+
+        <!-- ===== Fichiers inutiles ===== -->
+        <TextBlock Text="Fichiers inutiles" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,18,0,0" />
         <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
                    Text="Libère de l'espace disque, sans effet sur les FPS (utile surtout si le disque est presque plein). Les fichiers en cours d'utilisation sont ignorés, et les fichiers temporaires de moins de 2 heures sont épargnés (installation en cours)." />
 
@@ -39,5 +42,138 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <!-- ===== Optimisation des lecteurs (équivalent de l'outil Windows « Optimiser les lecteurs ») ===== -->
+        <StackPanel DataContext="{Binding Drives}" Margin="0,36,0,0">
+            <TextBlock Text="Optimisation des lecteurs" FontSize="19" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+            <TextBlock Style="{StaticResource DimText}" Margin="0,6,0,0"
+                       Text="Entretien du disque : temps de chargement et longévité, aucun effet direct sur les FPS." />
+            <TextBlock Style="{StaticResource DimText}" FontSize="12" Margin="0,4,0,0"
+                       Text="Comme l'outil de Windows, « Optimiser » choisit tout seul le bon traitement : TRIM pour un SSD, défragmentation pour un disque dur. Un SSD n'est jamais défragmenté. Tu peux utiliser le PC pendant l'optimisation." />
+
+            <WrapPanel Margin="0,18,0,0">
+                <Button Content="Tout optimiser" Style="{StaticResource AccentButton}" Command="{Binding OptimizeAllCommand}"
+                        IsEnabled="{Binding IsIdle}" Margin="0,0,10,0" />
+                <Button Content="Arrêter" Command="{Binding StopCommand}" Margin="0,0,10,0"
+                        Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}" />
+                <Button Content="Actualiser" Command="{Binding LoadCommand}" IsEnabled="{Binding IsIdle}" />
+            </WrapPanel>
+
+            <TextBlock Text="Lecture des lecteurs…" Style="{StaticResource DimText}" Margin="0,14,0,0"
+                       Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" />
+            <TextBlock Text="{Binding LoadError}" Style="{StaticResource BodyText}" Foreground="{StaticResource WarnBrush}" Margin="0,14,0,0"
+                       Visibility="{Binding LoadError, Converter={StaticResource NullToCollapsed}}" />
+            <Border Style="{StaticResource Card}" Margin="0,12,0,0" BorderBrush="{StaticResource AccentBrush}"
+                    Visibility="{Binding ResultText, Converter={StaticResource NullToCollapsed}}">
+                <TextBlock Text="{Binding ResultText}" Style="{StaticResource BodyText}" Foreground="{StaticResource AccentBrush}" />
+            </Border>
+
+            <!-- En-têtes de colonnes -->
+            <Grid Margin="16,16,16,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="190" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Lecteur" Style="{StaticResource DimText}" FontSize="12" />
+                <TextBlock Grid.Column="1" Text="Dernière optimisation" Style="{StaticResource DimText}" FontSize="12" />
+                <TextBlock Grid.Column="2" Text="État actuel" Style="{StaticResource DimText}" FontSize="12" />
+                <TextBlock Grid.Column="3" Width="218" />
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Rows}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource Card}" Padding="16,12" Margin="0,0,0,8">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="190" />
+                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Style="{StaticResource DimText}" FontSize="12">
+                                            <Run Text="{Binding MediaText, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{Binding SizeText, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding LastText}" Style="{StaticResource BodyText}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StateText}" VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Margin="0,0,12,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding NeedsAttention}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource WarnBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding CanOptimize}" Value="False">
+                                                        <Setter Property="Foreground" Value="{StaticResource TextDimBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <!-- Bordure transparente : l'infobulle reste visible même quand le bouton est grisé -->
+                                        <Border Background="Transparent" ToolTip="{Binding AnalyzeTip}" Margin="0,0,8,0">
+                                            <Button Content="Analyser" Command="{Binding AnalyzeCommand}" Padding="14,8" Width="100"
+                                                    IsEnabled="{Binding AnalyzeEnabled}" />
+                                        </Border>
+                                        <Border Background="Transparent" ToolTip="{Binding OptimizeTip}">
+                                            <Button Content="Optimiser" Style="{StaticResource AccentButton}" Command="{Binding OptimizeCommand}" Padding="14,8" Width="110"
+                                                    IsEnabled="{Binding OptimizeEnabled}" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                                <!-- Avancement (dans la ligne : l'appli reste utilisable pendant une longue défragmentation) -->
+                                <StackPanel Margin="0,12,0,0" Visibility="{Binding IsWorking, Converter={StaticResource BoolToVis}}">
+                                    <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding Progress}" IsIndeterminate="{Binding IsIndeterminate}"
+                                                 Foreground="{StaticResource AccentBrush}" Background="{StaticResource BorderBrush}" BorderThickness="0" />
+                                    <TextBlock Text="{Binding ProgressText}" Style="{StaticResource DimText}" FontSize="12" Margin="0,6,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Optimisation planifiée de Windows -->
+            <Border Style="{StaticResource Card}" Margin="0,8,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                        <TextBlock Text="{Binding Scheduled.Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+                        <TextBlock Text="{Binding ScheduledText}" FontSize="14" FontWeight="SemiBold" Margin="0,4,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource WarnBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ScheduledEnabled}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="{Binding Scheduled.Description}" Style="{StaticResource DimText}" Margin="0,4,0,0" />
+                        <TextBlock Text="{Binding Scheduled.UnavailableReason}" Style="{StaticResource BodyText}" Foreground="{StaticResource InfoBrush}" FontSize="12" Margin="0,4,0,0"
+                                   Visibility="{Binding Scheduled.UnavailableReason, Converter={StaticResource NullToCollapsed}}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Activer" Style="{StaticResource AccentButton}" Command="{Binding Scheduled.ApplyCommand}" Padding="14,8" Margin="0,0,8,0"
+                                IsEnabled="{Binding Scheduled.IsAvailable}"
+                                Visibility="{Binding ScheduledEnabled, Converter={StaticResource InverseBoolToVis}}" />
+                        <Button Content="Annuler" Command="{Binding Scheduled.RevertCommand}" Padding="14,8"
+                                Visibility="{Binding Scheduled.HasBackup, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
     </StackPanel>
 </UserControl>

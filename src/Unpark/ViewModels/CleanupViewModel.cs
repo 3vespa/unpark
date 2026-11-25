@@ -30,12 +30,15 @@ public sealed partial class CleanupRowViewModel : ObservableObject
     partial void OnIsCheckedChanged(bool value) => _changed();
 }
 
-/// <summary>Page « Nettoyage » : analyse (espace récupérable), puis nettoyage de la sélection (espace gagné).</summary>
+/// <summary>Page « Nettoyage » : fichiers inutiles (espace récupérable, puis espace gagné) et optimisation des lecteurs.</summary>
 public sealed partial class CleanupViewModel : PageViewModel
 {
     private static AppServices S => AppServices.Current;
 
     public CleanupViewModel() : base("Nettoyage", "") { }
+
+    /// <summary>Section « Optimisation des lecteurs ».</summary>
+    public DriveOptimizationViewModel Drives { get; } = new();
 
     public ObservableCollection<CleanupRowViewModel> Rows { get; } = [];
     [ObservableProperty] private string _totalText = "Lance l'analyse pour voir l'espace récupérable.";

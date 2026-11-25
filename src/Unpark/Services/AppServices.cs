@@ -5,6 +5,7 @@ using Unpark.Core.Cleanup;
 using Unpark.Core.Commands;
 using Unpark.Core.Debloat;
 using Unpark.Core.Diagnostics;
+using Unpark.Core.Disks;
 using Unpark.Core.Gaming;
 using Unpark.Core.Legacy;
 using Unpark.Core.Logging;
@@ -41,7 +42,9 @@ public sealed class AppServices
         Startup = new StartupService(Context, new WindowsLogonTaskApi(), StartupFolders.Default);
         // Mode dynamique (retiré en v0.9.1) : seulement pour que « Tout annuler » défasse ce qu'une ancienne version avait fait.
         var legacyDynamic = new LegacyDynamicAutostart(Context, new WindowsLegacyDynamicSystem(System.IO.Path.Combine(Paths.Root, "dynamic.json")));
-        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy], SettingsEngine.SystemLastBootUtc,
+        Disks = new DiskOptimizer(new WindowsDiskSystem(), Log);
+        ScheduledOptimization = new ScheduledOptimizationSetting(Context, new WindowsScheduledOptimizationApi());
+        Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy, ScheduledOptimization], SettingsEngine.SystemLastBootUtc,
             id => id == LegacyDynamicAutostart.SettingId ? legacyDynamic : Startup.Resolve(id));
         SystemInfo = new SystemInfoService(new WmiHardwareInfoApi(), Registry, Power, Startup);
         Diagnostics = new WindowsDiagnostics(Registry, Power, Startup, Commands, Log);
@@ -66,6 +69,8 @@ public sealed class AppServices
     public IReadOnlyList<ISetting> Gaming { get; }
     public StartupService Startup { get; }
     public CleanupService Cleanup { get; }
+    public DiskOptimizer Disks { get; }
+    public ScheduledOptimizationSetting ScheduledOptimization { get; }
     public DebloatService Debloat { get; }
     public SystemInfoService SystemInfo { get; }
     public WindowsDiagnostics Diagnostics { get; }
