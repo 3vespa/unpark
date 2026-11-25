@@ -79,7 +79,7 @@ public sealed partial class DebloatViewModel : PageViewModel
         }
         var list = string.Join("\n", selected.Select(r => "• " + r.Name));
         if (!Dialogs.Confirm($"Retirer ces applis pour ton compte Windows ?\n\n{list}\n\n" +
-                             "Pas d'« Annuler » automatique : une appli retirée se réinstalle depuis le Microsoft Store (liens gardés plus bas dans cette page)."))
+                             "Pas d'« Annuler » automatique : une appli retirée se réinstalle depuis le Microsoft Store (liens gardés plus bas dans cette page).", danger: true))
             return;
         if (!await SafetyFlow.BeforeFirstChangeAsync()) return;
 

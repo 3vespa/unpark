@@ -69,7 +69,7 @@ public sealed partial class CleanupViewModel : PageViewModel
             return;
         }
         var list = string.Join("\n", selected.Select(r => $"• {r.Label} ({Format.Bytes(r.Bytes)})"));
-        if (!Dialogs.Confirm($"Supprimer définitivement :\n\n{list}\n\nCes fichiers ne pourront pas être récupérés. Les fichiers en cours d'utilisation seront simplement ignorés.\n\nContinuer ?"))
+        if (!Dialogs.Confirm($"Supprimer définitivement :\n\n{list}\n\nCes fichiers ne pourront pas être récupérés. Les fichiers en cours d'utilisation seront simplement ignorés.\n\nContinuer ?", danger: true))
             return;
 
         var results = await S.RunBusyAsync("Nettoyage en cours…", () => S.Cleanup.Clean(selected.Select(r => r.Target.Id)));

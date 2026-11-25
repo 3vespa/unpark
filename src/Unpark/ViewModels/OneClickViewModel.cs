@@ -130,7 +130,7 @@ public sealed partial class OneClickViewModel : PageViewModel
         }
         var list = string.Join("\n", selected.Select(s => $"• {s.Target.Label} ({Format.Bytes(s.Bytes)})"));
         if (!Dialogs.Confirm($"Nettoyer maintenant ? Espace récupérable : {Format.Bytes(selected.Sum(s => s.Bytes))}\n\n{list}\n\n" +
-                             "Ces fichiers ne pourront pas être récupérés (la corbeille n'est pas touchée)."))
+                             "Ces fichiers ne pourront pas être récupérés (la corbeille n'est pas touchée).", danger: true))
             return;
         var results = await S.RunBusyAsync("Nettoyage en cours…", () => S.Cleanup.Clean(selected.Select(s => s.Target.Id)));
         var skipped = results.Sum(r => r.Skipped);

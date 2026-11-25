@@ -1,6 +1,7 @@
 using Unpark.Core.Gaming;
 using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
+using Unpark.Core.Ui;
 
 namespace Unpark.Services;
 
@@ -24,9 +25,9 @@ public static class SafetyFlow
             "Créer un point de restauration Windows avant ? C'est recommandé : en cas de souci, il remet le PC dans l'état d'avant. " +
             "La création prend de 30 secondes à 1 minute.\n\n" +
             "Oui : créer le point, puis continuer\nNon : continuer sans\nAnnuler : ne rien modifier");
-        if (answer == System.Windows.MessageBoxResult.Cancel) return false;
+        if (answer == DialogChoice.Cancel) return false;
         S.Backup.MarkRestorePointOffered();
-        if (answer == System.Windows.MessageBoxResult.No)
+        if (answer == DialogChoice.No)
         {
             S.Log.Info("Point de restauration proposé : refusé par l'utilisateur");
             return true;
@@ -76,7 +77,7 @@ public static class SafetyFlow
             Dialogs.Info($"« {setting.Name} » : {reason}");
             return false;
         }
-        return setting is not IWarnedSetting w || Dialogs.Confirm(w.Warning);
+        return setting is not IWarnedSetting w || Dialogs.Confirm(w.Warning, danger: true);
     }
 
     public static async Task ApplyAsync(ISetting setting)

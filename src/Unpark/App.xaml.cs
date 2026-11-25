@@ -37,9 +37,8 @@ public partial class App : Application
     private static void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         AppServices.Current?.Log.Error("Erreur inattendue", e.Exception);
-        MessageBox.Show(
-            $"Une erreur inattendue est survenue :\n\n{e.Exception.Message}\n\nLes détails sont dans le journal (Accueil → Ouvrir les journaux).",
-            "Unpark", MessageBoxButton.OK, MessageBoxImage.Error);
+        Dialogs.Error(
+            $"Une erreur inattendue est survenue :\n\n{e.Exception.Message}\n\nLes détails sont dans le journal (Accueil → Ouvrir les journaux).");
         e.Handled = true;
     }
 }

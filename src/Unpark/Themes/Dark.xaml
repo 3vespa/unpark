@@ -27,6 +27,9 @@
     <SolidColorBrush x:Key="WarnBrush" Color="{StaticResource WarnColor}" />
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
     <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
+    <!-- Bouton principal des confirmations risquées (Intégrité de la mémoire, suppression définitive…). -->
+    <SolidColorBrush x:Key="DangerButtonBrush" Color="#FF4D4D" />
+    <SolidColorBrush x:Key="DangerButtonTextBrush" Color="#1A0606" />
 
     <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -105,6 +108,12 @@
         <Setter Property="Background" Value="{StaticResource AccentBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
         <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}" />
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="Background" Value="{StaticResource DangerButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource DangerButtonBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource DangerButtonTextBrush}" />
     </Style>
 
     <!-- Élément du menu de gauche -->

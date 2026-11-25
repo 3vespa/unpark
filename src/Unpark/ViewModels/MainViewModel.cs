@@ -52,7 +52,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void RestartNow()
     {
-        if (!Dialogs.Confirm("Redémarrer le PC maintenant ?\n\nEnregistre ton travail et ferme tes jeux avant. Le redémarrage commence dans 10 secondes.")) return;
+        if (!Dialogs.Confirm("Redémarrer le PC maintenant ?\n\nEnregistre ton travail et ferme tes jeux avant. Le redémarrage commence dans 10 secondes.", danger: true)) return;
         AppServices.Current.Log.Info("Redémarrage demandé par l'utilisateur");
         Process.Start(new ProcessStartInfo("shutdown.exe", "/r /t 10 /c \"Redémarrage demandé par Unpark\"") { UseShellExecute = false, CreateNoWindow = true });
     }
