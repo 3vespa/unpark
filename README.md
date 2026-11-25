@@ -30,8 +30,6 @@ Fonctionne sur **Windows 10 (22H2)** et **Windows 11**. Rien à installer : c'es
 
 ## 3. Ce que fait Unpark
 
-| Page | Ce qu'elle fait | Annulable ? |
-| --- | --- | --- |
 Unpark ne garde que des réglages à l'effet reconnu, et dit honnêtement ce que chacun apporte. Tout est optionnel.
 
 | Réglage | Ce qu'il apporte vraiment | Annulable ? |
@@ -43,23 +41,28 @@ Unpark ne garde que des réglages à l'effet reconnu, et dit honnêtement ce que
 | **HAGS** | Nécessaire pour DLSS Frame Generation (RTX 40/50, recommandé seulement là). Ailleurs, effet quasi nul et peut réserver de la mémoire vidéo sur les cartes de 6-8 Go. Redémarrage requis. | ✅ |
 | **Accélération de la souris désactivée** | Aucun gain de FPS : rend la visée constante. | ✅ |
 | **Intégrité de la mémoire désactivée** | 0 à ~10 % selon le processeur et le jeu, **mais moins de sécurité**. Jamais dans le profil 1 clic, avertissement avant. Redémarrage requis. | ✅ |
-| **Mode dynamique** | Unpark Performance quand tu utilises le PC, Équilibré après X minutes d'inactivité (icône « U » dans la zone de notification). Moins de consommation et de bruit au repos ; en jeu, mêmes performances que le plan permanent. | ✅ « Arrêter », et la tâche de démarrage s'annule |
 | **Démarrage** | Windows démarre plus vite ; en jeu, utile seulement si ces programmes consomment en fond. | ✅ réactiver remet l'état d'origine |
 | **Nettoyage** | Espace disque uniquement, aucun effet sur les FPS (corbeille décochée par défaut). | ❌ fichiers supprimés pour de bon |
+| **Optimisation des lecteurs** (page Nettoyage) | Entretien du disque : temps de chargement et longévité, aucun effet direct sur les FPS. TRIM pour un SSD, défragmentation pour un disque dur, jamais de défragmentation sur un SSD. | — entretien normal de Windows ; l'activation de l'optimisation planifiée, elle, est annulable ✅ |
 | **Debloat** | Rangement : quasi aucun effet sur les FPS. Le Store, la Calculatrice, Photos, le Terminal et les applis Xbox ne sont jamais proposés. | ⚠️ réinstallation depuis le Microsoft Store (bouton dans la page) |
 | **Diagnostic** | Lecture seule : RAM (XMP/EXPO, double canal), fréquence de l'écran, pilote graphique, erreurs, disques, réseau… avec un bouton vers la correction. **« Copier le rapport »** pour Discord. | — |
 | **Infos système** | Processeur, carte graphique, mémoire, disques… Bouton **« Copier le résumé »**. | — |
 
 Ce qu'Unpark ne fait **jamais**, parce que c'est inutile ou risqué : désactiver Windows Defender, le pare-feu ou Windows Update, « nettoyer la RAM », réglages réseau du registre « anti-ping », désactivation de services au hasard, commandes bcdedit (HPET, dynamic tick…), résolution de la minuterie, effets visuels « performances » (aucun effet en jeu).
 
-### Mode dynamique (optionnel)
+### Optimisation des lecteurs (page Nettoyage)
 
-1. Installe d'abord le plan (page **Plan d'alimentation**).
-2. Page **Mode dynamique** → **Démarrer le mode dynamique** : une icône « U » apparaît près de l'horloge (vert = Unpark Performance, gris = Équilibré, orange = en pause).
-3. Pour qu'il se lance tout seul avec Windows : **Lancer le mode dynamique avec Windows → Appliquer**.
-4. Clic droit sur l'icône : mettre en pause, forcer un plan, ouvrir Unpark, quitter.
+C'est l'outil Windows « Optimiser les lecteurs », dans Unpark :
 
-Bon à savoir : une manette n'est pas vue par Windows comme une activité, c'est pourquoi un jeu ou une vidéo **en plein écran** compte aussi comme une activité. Si tu changes de plan à la main, le mode dynamique se met en pause au lieu de se battre avec toi.
+1. La liste montre chaque lecteur : type (SSD ou disque dur), date de dernière optimisation et état (« OK », « 12 % fragmenté »…).
+2. **Analyser** (disques durs seulement, comme dans Windows) mesure la fragmentation sans rien modifier.
+3. **Optimiser** ou **Tout optimiser** fait automatiquement le bon traitement : **TRIM** pour un SSD, **défragmentation** pour un disque dur. Un SSD n'est **jamais** défragmenté. Un lecteur de type inconnu (clé USB, disque virtuel) n'est pas touché.
+4. Une barre de progression s'affiche dans la ligne du lecteur ; tu peux continuer à utiliser le PC, ou cliquer sur **Arrêter** (sans risque pour tes fichiers).
+5. En bas : l'**optimisation planifiée** de Windows (activée et sa fréquence). Si elle est coupée, **Activer** la relance ; c'est annulable.
+
+Entretien du disque : temps de chargement et longévité, aucun effet direct sur les FPS.
+
+> Le mode dynamique a été retiré en v0.9.1. Si tu l'avais activé avec une ancienne version, **Tout annuler** supprime encore sa tâche de démarrage.
 
 ## 4. Tout annuler
 
@@ -94,7 +97,7 @@ Trois niveaux, du plus simple au plus radical :
 ```
 src/Unpark/         interface WPF (MVVM CommunityToolkit.Mvvm, thème sombre)
 src/Unpark.Core/    logique : réglages réversibles (IsApplied/Apply/Revert), sauvegarde, journal,
-                    point de restauration, plan d'alimentation, Gaming, Démarrage, Nettoyage, Debloat, infos
+                    point de restauration, plan d'alimentation, Gaming, Démarrage, Nettoyage, disques, Debloat, infos
 src/Unpark.Tests/   tests automatiques (tournent sous Linux, Windows simulé)
 releases/           exe publiés (pas dans git)
 ```

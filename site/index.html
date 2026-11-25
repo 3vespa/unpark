@@ -40,8 +40,8 @@
         <img class="hero-logo" src="logo.svg" alt="Logo Unpark" width="112" height="112">
         <h1>Unpark <span class="dash">—</span> <span class="accent">Optimisation PC gaming</span></h1>
         <p class="lead">Les réglages Windows qui comptent vraiment pour le jeu, et rien d'autre. Pas de promesse de +50&nbsp;FPS : tout est optionnel, tout s'annule en un clic.</p>
-        <a class="btn btn-big" href="https://github.com/3vespa/unpark/releases/download/v0.9.0/Unpark-v0.9.0.exe" data-r-href="url">
-          Télécharger <span class="btn-sub">v<span data-r="version">0.9.0</span> · Windows 10 et 11 · gratuit</span>
+        <a class="btn btn-big" href="https://github.com/3vespa/unpark/releases/download/v0.9.1/Unpark-v0.9.1.exe" data-r-href="url">
+          Télécharger <span class="btn-sub">v<span data-r="version">0.9.1</span> · Windows 10 et 11 · gratuit</span>
         </a>
         <p class="hero-note">Un seul fichier, rien à installer.</p>
         <a class="btn-discord" href="https://discord.gg/7HBemp572d" target="_blank" rel="noopener">
@@ -106,11 +106,6 @@
             <p class="gain">Gain réel mais modeste : surtout les 1&nbsp;% low dans les jeux limités par le processeur.</p>
           </article>
           <article class="card feature">
-            <h3>Mode dynamique</h3>
-            <p>Une icône près de l'horloge : plan Performance quand tu utilises le PC, Équilibré après quelques minutes d'inactivité.</p>
-            <p class="gain">Moins de chaleur et de bruit au repos, mêmes performances en jeu.</p>
-          </article>
-          <article class="card feature">
             <h3>Gaming</h3>
             <p>Mode Jeu, enregistrement en arrière-plan de la Game Bar, optimisations des jeux en fenêtre (Windows 11), HAGS (recommandé seulement sur RTX&nbsp;40/50), accélération de la souris, Intégrité de la mémoire (avec avertissement).</p>
             <p class="gain">Chaque réglage dit son effet réel, souvent faible mais mesurable.</p>
@@ -124,6 +119,11 @@
             <h3>Nettoyage</h3>
             <p>Fichiers temporaires, cache de Windows Update, corbeille. L'espace récupérable s'affiche avant, l'espace gagné après.</p>
             <p class="gain">De l'espace disque, aucun effet sur les FPS.</p>
+          </article>
+          <article class="card feature">
+            <h3>Optimisation des lecteurs</h3>
+            <p>L'outil Windows « Optimiser les lecteurs », dans Unpark : TRIM pour un SSD, défragmentation pour un disque dur (jamais sur un SSD), avec la progression et l'état de l'optimisation planifiée.</p>
+            <p class="gain">Entretien du disque : temps de chargement et longévité, aucun effet direct sur les FPS.</p>
           </article>
           <article class="card feature">
             <h3>Debloat</h3>
@@ -145,14 +145,14 @@
         <h2>Téléchargement</h2>
         <div class="grid grid-2">
           <div class="card download">
-            <h3>Unpark v<span data-r="version">0.9.0</span></h3>
+            <h3>Unpark v<span data-r="version">0.9.1</span></h3>
             <dl class="facts">
               <dt>Taille</dt><dd data-r="size">70 Mo</dd>
-              <dt>Date</dt><dd data-r="date">24 novembre 2026</dd>
+              <dt>Date</dt><dd data-r="date">25 novembre 2026</dd>
               <dt>Configuration</dt><dd>Windows 10 (22H2) ou Windows 11, 64 bits</dd>
-              <dt>SHA-256</dt><dd><code data-r="sha256">405042ef300f0bc4a3114ffea4d9edbe76bd4d942189d41c08541b933af65dea</code></dd>
+              <dt>SHA-256</dt><dd><code data-r="sha256">8ef9996163bbc7a6a67250c96bf01a0be33af9ab12c58cf8a79eead5e15478ba</code></dd>
             </dl>
-            <a class="btn" href="https://github.com/3vespa/unpark/releases/download/v0.9.0/Unpark-v0.9.0.exe" data-r-href="url">Télécharger l'exe</a>
+            <a class="btn" href="https://github.com/3vespa/unpark/releases/download/v0.9.1/Unpark-v0.9.1.exe" data-r-href="url">Télécharger l'exe</a>
             <a class="link" href="https://github.com/3vespa/unpark/releases/latest" data-r-href="latest">Toutes les versions sur GitHub</a>
           </div>
           <div class="card">
@@ -163,7 +163,7 @@
               <li>Puis sur <strong>« Exécuter quand même »</strong>.</li>
               <li>Accepte la demande d'autorisation administrateur : Unpark en a besoin pour modifier les réglages de Windows.</li>
             </ol>
-            <p class="muted">Pour vérifier que le fichier n'a pas été modifié, compare son empreinte dans PowerShell :<br><code>Get-FileHash .\Unpark-v<span data-r="version">0.9.0</span>.exe</code></p>
+            <p class="muted">Pour vérifier que le fichier n'a pas été modifié, compare son empreinte dans PowerShell :<br><code>Get-FileHash .\Unpark-v<span data-r="version">0.9.1</span>.exe</code></p>
           </div>
         </div>
         <div class="card help">
