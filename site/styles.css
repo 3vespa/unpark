@@ -110,6 +110,7 @@ ul.crosses li { color: var(--dim); }
 .facts dt { color: var(--dim); }
 .facts dd { margin: 0; }
 .download .btn { flex-direction: row; }
+.download .update-note { margin: 20px 0 0; font-size: 14px; }
 ol.steps { padding-left: 22px; }
 ol.steps li { margin-bottom: 8px; }
 

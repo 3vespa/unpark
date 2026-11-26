@@ -40,8 +40,8 @@
         <img class="hero-logo" src="logo.svg" alt="Logo Unpark" width="112" height="112">
         <h1>Unpark <span class="dash">—</span> <span class="accent">Optimisation PC gaming</span></h1>
         <p class="lead">Les réglages Windows qui comptent vraiment pour le jeu, et rien d'autre. Pas de promesse de +50&nbsp;FPS : tout est optionnel, tout s'annule en un clic.</p>
-        <a class="btn btn-big" href="https://github.com/3vespa/unpark/releases/download/v0.9.1/Unpark-v0.9.1.exe" data-r-href="url">
-          Télécharger <span class="btn-sub">v<span data-r="version">0.9.1</span> · Windows 10 et 11 · gratuit</span>
+        <a class="btn btn-big" href="https://github.com/3vespa/unpark/releases/download/v0.10.0/Unpark-v0.10.0.exe" data-r-href="url">
+          Télécharger <span class="btn-sub">v<span data-r="version">0.10.0</span> · Windows 10 et 11 · gratuit</span>
         </a>
         <p class="hero-note">Un seul fichier, rien à installer.</p>
         <a class="btn-discord" href="https://discord.gg/7HBemp572d" target="_blank" rel="noopener">
@@ -64,7 +64,8 @@
               <li><strong>Tout est optionnel.</strong> Rien n'est appliqué sans ton accord, et chaque réglage se choisit séparément.</li>
               <li><strong>Tout s'annule.</strong> La valeur d'origine est sauvegardée avant chaque modification : « Tout annuler » remet ton PC exactement comme avant.</li>
               <li><strong>Point de restauration.</strong> Proposé avant la première modification, pour pouvoir revenir en arrière même si Unpark ne s'ouvre plus.</li>
-              <li><strong>Transparent.</strong> Chaque action est notée dans un journal. Aucune pub, aucune collecte de données.</li>
+              <li><strong>Transparent.</strong> Chaque action est notée dans un journal. Aucune pub, aucune collecte de données. Seule connexion : la vérification des mises à jour sur GitHub, désactivable.</li>
+              <li><strong>Mises à jour signées.</strong> Unpark se met à jour tout seul, comme Steam ou Discord, et refuse toute mise à jour dont la signature ne correspond pas. Tes réglages et « Tout annuler » sont conservés.</li>
             </ul>
           </div>
           <div class="card">
@@ -93,6 +94,7 @@
           <article class="card feature">
             <h3>Diagnostic</h3>
             <p>En 40 secondes et sans rien modifier : RAM (XMP/EXPO, double canal), fréquence de l'écran, pilote graphique, erreurs matérielles, disques, réseau. Repère les vrais freins, comme un écran 144&nbsp;Hz réglé à 60&nbsp;Hz.</p>
+            <p>Corrections sur la ligne même : « Passer à 144&nbsp;Hz » (avec retour automatique au bout de 15&nbsp;s sans confirmation), guide pour activer XMP/EXPO dans le BIOS selon ta carte mère, lien vers la page officielle du pilote graphique.</p>
             <p class="gain">Le plus utile pour commencer.</p>
           </article>
           <article class="card feature">
@@ -145,15 +147,16 @@
         <h2>Téléchargement</h2>
         <div class="grid grid-2">
           <div class="card download">
-            <h3>Unpark v<span data-r="version">0.9.1</span></h3>
+            <h3>Unpark v<span data-r="version">0.10.0</span></h3>
             <dl class="facts">
-              <dt>Taille</dt><dd data-r="size">70 Mo</dd>
-              <dt>Date</dt><dd data-r="date">25 novembre 2026</dd>
+              <dt>Taille</dt><dd data-r="size">72 Mo</dd>
+              <dt>Date</dt><dd data-r="date">26 novembre 2026</dd>
               <dt>Configuration</dt><dd>Windows 10 (22H2) ou Windows 11, 64 bits</dd>
-              <dt>SHA-256</dt><dd><code data-r="sha256">8ef9996163bbc7a6a67250c96bf01a0be33af9ab12c58cf8a79eead5e15478ba</code></dd>
+              <dt>SHA-256</dt><dd><code data-r="sha256">b980933b78762cb48d25d261839c5bcc4ddd45efd406aa44ec5f1203fc6b64a7</code></dd>
             </dl>
-            <a class="btn" href="https://github.com/3vespa/unpark/releases/download/v0.9.1/Unpark-v0.9.1.exe" data-r-href="url">Télécharger l'exe</a>
+            <a class="btn" href="https://github.com/3vespa/unpark/releases/download/v0.10.0/Unpark-v0.10.0.exe" data-r-href="url">Télécharger l'exe</a>
             <a class="link" href="https://github.com/3vespa/unpark/releases/latest" data-r-href="latest">Toutes les versions sur GitHub</a>
+            <p class="muted update-note">Déjà installé ? À partir de la v0.10.0, Unpark télécharge les nouvelles versions tout seul et les installe en un clic (« Redémarrer maintenant ») ou à la prochaine ouverture. Pour couper : <strong>Accueil → Mises à jour</strong>. Depuis une version plus ancienne, télécharge la v0.10.0 une dernière fois à la main.</p>
           </div>
           <div class="card">
             <h3>Windows affiche une alerte bleue ?</h3>
@@ -163,7 +166,7 @@
               <li>Puis sur <strong>« Exécuter quand même »</strong>.</li>
               <li>Accepte la demande d'autorisation administrateur : Unpark en a besoin pour modifier les réglages de Windows.</li>
             </ol>
-            <p class="muted">Pour vérifier que le fichier n'a pas été modifié, compare son empreinte dans PowerShell :<br><code>Get-FileHash .\Unpark-v<span data-r="version">0.9.1</span>.exe</code></p>
+            <p class="muted">Pour vérifier que le fichier n'a pas été modifié, compare son empreinte dans PowerShell :<br><code>Get-FileHash .\Unpark-v<span data-r="version">0.10.0</span>.exe</code></p>
           </div>
         </div>
         <div class="card help">

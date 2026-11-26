@@ -1,7 +1,7 @@
 <Project>
   <!-- Réglages communs à tous les projets. La version est ici, et seulement ici. -->
   <PropertyGroup>
-    <Version>0.9.1</Version>
+    <Version>0.10.0</Version>
     <Product>Unpark</Product>
     <Description>Optimisation PC gaming</Description>
     <Company>Unpark</Company>
