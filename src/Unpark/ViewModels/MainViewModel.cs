@@ -32,6 +32,9 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshRestart();
     }
 
+    /// <summary>Bandeau des mises à jour (en haut, comme celui du redémarrage).</summary>
+    public UpdateBannerViewModel Update { get; } = new();
+
     /// <summary>Texte de l'opération longue en cours (affiché par-dessus l'appli), null sinon.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBusy))]

@@ -55,5 +55,18 @@
             </StackPanel>
         </Border>
 
+        <!-- Mises à jour -->
+        <TextBlock Text="Mises à jour" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" Margin="0,28,0,0" />
+        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+            <StackPanel>
+                <CheckBox IsChecked="{Binding AutoUpdate}">
+                    <TextBlock Text="Mettre à jour Unpark automatiquement" Style="{StaticResource BodyText}" FontWeight="SemiBold" />
+                </CheckBox>
+                <TextBlock Style="{StaticResource DimText}" Margin="0,8,0,0"
+                           Text="Au démarrage, Unpark regarde s'il existe une nouvelle version sur GitHub (3vespa/unpark), la télécharge en arrière-plan, puis l'installe quand tu cliques sur « Redémarrer maintenant » ou à la prochaine ouverture. Chaque mise à jour est vérifiée (signature et empreinte) avant d'être installée ; tes réglages et la sauvegarde « Tout annuler » sont conservés. Décoché : Unpark ne se connecte plus à GitHub, tu télécharges les nouvelles versions toi-même." />
+                <TextBlock Text="{Binding VersionText}" Style="{StaticResource DimText}" Margin="0,8,0,0" />
+            </StackPanel>
+        </Border>
+
     </StackPanel>
 </UserControl>

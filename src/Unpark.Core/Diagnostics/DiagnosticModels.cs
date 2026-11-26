@@ -6,7 +6,11 @@ public sealed record RamModule(long CapacityBytes, int RatedMts, int ConfiguredM
 
 public sealed record RamData(IReadOnlyList<RamModule> Modules, long TotalBytes, long AvailableBytes);
 
-public sealed record DisplayData(string Name, int Width, int Height, int CurrentHz, int MaxHz);
+/// <param name="DeviceName">Nom Windows de l'écran (« \\.\DISPLAY1 »), nécessaire pour changer sa fréquence.</param>
+public sealed record DisplayData(string Name, int Width, int Height, int CurrentHz, int MaxHz, string DeviceName = "");
+
+/// <summary>Fabricant de la carte mère et du PC (Win32_BaseBoard, Win32_ComputerSystem) et du processeur, pour le guide XMP / EXPO.</summary>
+public sealed record BoardData(string BoardManufacturer, string BoardProduct, string SystemManufacturer, string SystemModel, string CpuManufacturer);
 
 public sealed record NvidiaData(int? TemperatureC, int? PcieGenCurrent, int? PcieGenMax, int? PcieWidthCurrent, int? PcieWidthMax, long? Bar1TotalMiB);
 
@@ -46,7 +50,8 @@ public sealed record DiagnosticData(
     IReadOnlyList<VolumeData> Volumes,
     IReadOnlyList<GameFolder> GameFolders,
     WindowsData? Windows,
-    NetworkData? Network);
+    NetworkData? Network,
+    BoardData? Board = null);
 
 // Résultat de l'analyse.
 
@@ -55,6 +60,22 @@ public enum DiagStatus { Green, Orange, Red, Info }
 /// <summary>Page d'Unpark (ou de Windows) qui corrige le problème.</summary>
 public enum DiagFix { None, PowerPlan, Gaming, Startup, Cleanup, DisplaySettings, GraphicsSettings, WindowsUpdate }
 
-public sealed record DiagCheck(string Title, DiagStatus Status, string Value, string Explanation, DiagFix Fix = DiagFix.None);
+public sealed record DiagCheck(string Title, DiagStatus Status, string Value, string Explanation, DiagFix Fix = DiagFix.None)
+{
+    /// <summary>Correction directement sur la ligne (sans changer de page), ou null.</summary>
+    public DiagAction? Action { get; init; }
+}
+
+/// <summary>Correction proposée sur la ligne d'un problème du Diagnostic.</summary>
+public abstract record DiagAction;
+
+/// <summary>Bouton « Passer à X Hz » (avec confirmation et retour automatique après 15 s).</summary>
+public sealed record RefreshRateAction(string DeviceName, string DisplayName, int Width, int Height, int CurrentHz, int TargetHz) : DiagAction;
+
+/// <summary>Mini-guide dépliable pour activer XMP / EXPO dans le BIOS (impossible depuis Windows).</summary>
+public sealed record BiosGuideAction(BiosGuide Guide) : DiagAction;
+
+/// <summary>Bouton « Mettre à jour » : ouvre la page officielle des pilotes du fabricant. Unpark ne télécharge et n'installe rien.</summary>
+public sealed record DriverPageAction(string Vendor, string Url) : DiagAction;
 
 public sealed record DiagSection(string Title, IReadOnlyList<DiagCheck> Checks);

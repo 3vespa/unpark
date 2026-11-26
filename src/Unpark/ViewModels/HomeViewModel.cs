@@ -32,6 +32,21 @@ public sealed partial class HomeViewModel : PageViewModel
     public bool HasBackupWarning => BackupWarning is not null;
 
     [ObservableProperty] private string _restorePointText = "Recherche…";
+
+    public string VersionText => $"Version installée : {AppInfo.DisplayVersion}";
+
+    /// <summary>Mises à jour automatiques (Accueil). Décoché : aucune connexion à GitHub, rien n'est téléchargé.</summary>
+    public bool AutoUpdate
+    {
+        get => S.Preferences.AutoUpdate;
+        set
+        {
+            if (S.Preferences.AutoUpdate == value) return;
+            S.Preferences.AutoUpdate = value;
+            if (!value) UpdateBannerViewModel.Instance?.OnAutoUpdateDisabled();
+            OnPropertyChanged();
+        }
+    }
     [ObservableProperty] private string _activeChangesText = "";
 
     private void Refresh()

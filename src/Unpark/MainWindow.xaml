@@ -43,8 +43,34 @@
             </DockPanel>
         </Border>
 
-        <!-- Page affichée, avec le bandeau de redémarrage au-dessus -->
+        <!-- Page affichée, avec les bandeaux de mise à jour et de redémarrage au-dessus -->
         <DockPanel Grid.Column="1">
+            <Border DockPanel.Dock="Top" Padding="20,10" DataContext="{Binding Update}"
+                    Visibility="{Binding IsVisible, Converter={StaticResource BoolToVis}}">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsError}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Redémarrer maintenant" Command="{Binding RestartNowCommand}" Padding="14,6" Margin="12,0,0,0"
+                            Visibility="{Binding IsReady, Converter={StaticResource BoolToVis}}" />
+                    <Button DockPanel.Dock="Right" Content="Fermer" Command="{Binding DismissCommand}" Padding="14,6" Margin="12,0,0,0"
+                            Visibility="{Binding CanDismiss, Converter={StaticResource BoolToVis}}" />
+                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="#0B1A12" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Text}" Foreground="#0B1A12" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" />
+                        <ProgressBar Value="{Binding Progress, Mode=OneWay}" Maximum="100" Height="4" Margin="0,6,0,0" MaxWidth="420" HorizontalAlignment="Left" Width="420"
+                                     Foreground="#0B1A12" Background="#330B1A12" BorderThickness="0"
+                                     Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
             <Border DockPanel.Dock="Top" Background="{StaticResource WarnBrush}" Padding="20,10"
                     Visibility="{Binding RestartNeeded, Converter={StaticResource BoolToVis}}">
                 <DockPanel>

@@ -6,6 +6,7 @@ using Unpark.Core.Commands;
 using Unpark.Core.Debloat;
 using Unpark.Core.Diagnostics;
 using Unpark.Core.Disks;
+using Unpark.Core.Display;
 using Unpark.Core.Gaming;
 using Unpark.Core.Legacy;
 using Unpark.Core.Logging;
@@ -15,6 +16,7 @@ using Unpark.Core.RestorePoints;
 using Unpark.Core.Settings;
 using Unpark.Core.Startup;
 using Unpark.Core.SystemInfo;
+using Unpark.Core.Updates;
 using Unpark.Interop;
 
 namespace Unpark.Services;
@@ -44,8 +46,12 @@ public sealed class AppServices
         var legacyDynamic = new LegacyDynamicAutostart(Context, new WindowsLegacyDynamicSystem(System.IO.Path.Combine(Paths.Root, "dynamic.json")));
         Disks = new DiskOptimizer(new WindowsDiskSystem(), Log);
         ScheduledOptimization = new ScheduledOptimizationSetting(Context, new WindowsScheduledOptimizationApi());
+        RefreshRate = new RefreshRateChanger(Context, new WindowsDisplayModeApi());
         Engine = new SettingsEngine(Context, [PowerPlan, .. Gaming, .. legacy, ScheduledOptimization], SettingsEngine.SystemLastBootUtc,
-            id => id == LegacyDynamicAutostart.SettingId ? legacyDynamic : Startup.Resolve(id));
+            id => id == LegacyDynamicAutostart.SettingId ? legacyDynamic : RefreshRate.Resolve(id) ?? Startup.Resolve(id));
+        Preferences = new PreferencesStore(Paths.PreferencesFile, Log);
+        Updates = new UpdateService(new HttpUpdateClient(AppInfo.Version), Log, Paths.UpdatesDir, AppInfo.Version);
+        UpdateInstaller = new UpdateInstaller(Log);
         SystemInfo = new SystemInfoService(new WmiHardwareInfoApi(), Registry, Power, Startup);
         Diagnostics = new WindowsDiagnostics(Registry, Power, Startup, Commands, Log);
         _hags = new Lazy<Task<HagsAdvice>>(() => Task.Run(() =>
@@ -74,6 +80,10 @@ public sealed class AppServices
     public DebloatService Debloat { get; }
     public SystemInfoService SystemInfo { get; }
     public WindowsDiagnostics Diagnostics { get; }
+    public RefreshRateChanger RefreshRate { get; }
+    public PreferencesStore Preferences { get; }
+    public UpdateService Updates { get; }
+    public UpdateInstaller UpdateInstaller { get; }
 
     private readonly Lazy<Task<HagsAdvice>> _hags;
     /// <summary>Conseil HAGS selon la carte graphique (lu une seule fois).</summary>
@@ -90,20 +100,34 @@ public sealed class AppServices
     /// <summary>Opération longue en cours (texte affiché par-dessus l'appli), null sinon.</summary>
     public event Action<string?>? BusyChanged;
 
+    private int _busyCount;
+    /// <summary>Une opération longue est en cours (application de réglages, nettoyage, diagnostic…) : jamais de redémarrage d'Unpark pendant ce temps.</summary>
+    public bool IsBusy => Volatile.Read(ref _busyCount) > 0;
+
     /// <summary>Opération longue avec un texte d'avancement qui change.</summary>
     public async Task<T> RunBusyAsync<T>(string text, Func<IProgress<string>, Task<T>> work)
     {
+        Interlocked.Increment(ref _busyCount);
         BusyChanged?.Invoke(text);
         var progress = new Progress<string>(t => BusyChanged?.Invoke(t));
         try { return await Task.Run(() => work(progress)); }
-        finally { BusyChanged?.Invoke(null); }
+        finally
+        {
+            Interlocked.Decrement(ref _busyCount);
+            BusyChanged?.Invoke(null);
+        }
     }
 
     public async Task<T> RunBusyAsync<T>(string text, Func<T> work)
     {
+        Interlocked.Increment(ref _busyCount);
         BusyChanged?.Invoke(text);
         try { return await Task.Run(work); }
-        finally { BusyChanged?.Invoke(null); }
+        finally
+        {
+            Interlocked.Decrement(ref _busyCount);
+            BusyChanged?.Invoke(null);
+        }
     }
 
     public static void Init()

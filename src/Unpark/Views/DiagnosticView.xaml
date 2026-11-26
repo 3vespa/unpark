@@ -68,9 +68,44 @@
                                                     <TextBlock Text="{Binding Value}" Style="{StaticResource BodyText}" Foreground="{StaticResource TextBrush}" Opacity="0.85" />
                                                 </WrapPanel>
                                                 <TextBlock Text="{Binding Explanation}" Style="{StaticResource DimText}" FontSize="12" Margin="0,4,0,0" />
+                                                <!-- Guide XMP / EXPO dépliable, sur la ligne même -->
+                                                <Border Margin="0,12,0,0" Padding="14,12" CornerRadius="8" Background="{StaticResource BgBrush}"
+                                                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                                        Visibility="{Binding IsGuideOpen, Converter={StaticResource BoolToVis}}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Guide.Title}" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                                        <ItemsControl ItemsSource="{Binding Guide.Steps}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock Text="{Binding}" Style="{StaticResource BodyText}" FontSize="13" Margin="0,0,0,6" />
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                        <DockPanel Margin="0,6,0,0">
+                                                            <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" Foreground="{StaticResource WarnBrush}" Margin="0,2,8,0" />
+                                                            <TextBlock Text="{Binding Guide.Note}" Style="{StaticResource BodyText}" FontSize="13" Foreground="{StaticResource WarnBrush}" />
+                                                        </DockPanel>
+                                                    </StackPanel>
+                                                </Border>
                                             </StackPanel>
-                                            <Button Grid.Column="2" Content="{Binding FixText}" Command="{Binding FixCommand}" Padding="12,6" VerticalAlignment="Center"
-                                                    Visibility="{Binding HasFix, Converter={StaticResource BoolToVis}}" />
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                                                <Button Content="{Binding FixText}" Command="{Binding FixCommand}" Padding="12,6"
+                                                        Visibility="{Binding HasFix, Converter={StaticResource BoolToVis}}">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentFix}" Value="True">
+                                                                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource AccentTextBrush}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                                <Button Content="{Binding GuideButtonText}" Command="{Binding ToggleGuideCommand}" Padding="12,6"
+                                                        Visibility="{Binding HasGuide, Converter={StaticResource BoolToVis}}" />
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

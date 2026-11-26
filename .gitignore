@@ -9,3 +9,6 @@ publish/
 # Cache Python (contient des chemins locaux)
 __pycache__/
 *.pyc
+# Clés de signature : jamais dans git (la clé des mises à jour est dans ~/.config/unpark/)
+*.pem
+*.pem.gpg

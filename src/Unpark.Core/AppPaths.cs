@@ -10,4 +10,7 @@ public sealed class AppPaths(string root)
     public string BackupFile => Path.Combine(Root, "backup.json");
     public string LogsDir => Path.Combine(Root, "logs");
     public string DebloatHistoryFile => Path.Combine(Root, "debloat.json");
+    public string PreferencesFile => Path.Combine(Root, "preferences.json");
+    /// <summary>Mises à jour téléchargées et vérifiées, en attente d'installation.</summary>
+    public string UpdatesDir => Path.Combine(Root, "updates");
 }

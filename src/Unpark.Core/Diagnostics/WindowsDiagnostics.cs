@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Unpark.Core.Commands;
+using Unpark.Core.Display;
 using Unpark.Core.Logging;
 using Unpark.Core.Power;
 using Unpark.Core.Registry;
@@ -37,6 +38,7 @@ public sealed class WindowsDiagnostics(
         progress.Report("Lecture de la mémoire, de l'écran et de la carte graphique…");
         var ram = await Task.Run(() => Safe("RAM", ReadRam), cancel);
         var displays = await Task.Run(() => Safe("écran", ReadDisplays) ?? [], cancel);
+        var board = await Task.Run(() => Safe("carte mère", ReadBoard), cancel);
         var gpus = await Task.Run(() => Safe("carte graphique", ReadGpus) ?? [], cancel);
         progress.Report("Lecture du journal des erreurs (30 jours) et des disques…");
         var stability = await Task.Run(() => Safe("journal", ReadStability), cancel);
@@ -51,7 +53,7 @@ public sealed class WindowsDiagnostics(
         var windows = Safe("Windows", () => ReadWindows(cpu, top));
 
         log.Info("Diagnostic : terminé");
-        return new DiagnosticData(DateTime.Now, version, ram, displays, gpus, stability, disks, volumes, games, windows, network);
+        return new DiagnosticData(DateTime.Now, version, ram, displays, gpus, stability, disks, volumes, games, windows, network, board);
     }
 
     private T? Safe<T>(string what, Func<T> read) where T : class
@@ -78,23 +80,17 @@ public sealed class WindowsDiagnostics(
 
     // ---------- Écran ----------
 
-    private static IReadOnlyList<DisplayData> ReadDisplays()
+    private static IReadOnlyList<DisplayData> ReadDisplays() => new WindowsDisplayModeApi().Displays();
+
+    // ---------- Carte mère (guide XMP / EXPO) ----------
+
+    private static BoardData ReadBoard()
     {
-        var list = new List<DisplayData>();
-        var device = new DisplayDevice { Size = Marshal.SizeOf<DisplayDevice>() };
-        for (uint i = 0; EnumDisplayDevices(null, i, ref device, 0); i++, device.Size = Marshal.SizeOf<DisplayDevice>())
-        {
-            if ((device.StateFlags & AttachedToDesktop) == 0) continue;
-            var current = NewDevMode();
-            if (!EnumDisplaySettings(device.DeviceName, EnumCurrentSettings, ref current)) continue;
-            var max = current.DisplayFrequency;
-            var mode = NewDevMode();
-            for (var m = 0; EnumDisplaySettings(device.DeviceName, m, ref mode); m++)
-                if (mode.PelsWidth == current.PelsWidth && mode.PelsHeight == current.PelsHeight && mode.DisplayFrequency > max)
-                    max = mode.DisplayFrequency;
-            list.Add(new DisplayData($"Écran {list.Count + 1}", current.PelsWidth, current.PelsHeight, current.DisplayFrequency, max));
-        }
-        return list;
+        var board = Wmi(@"root\cimv2", "SELECT Manufacturer, Product FROM Win32_BaseBoard").FirstOrDefault();
+        var system = Wmi(@"root\cimv2", "SELECT Manufacturer, Model FROM Win32_ComputerSystem").FirstOrDefault();
+        var cpu = Wmi(@"root\cimv2", "SELECT Manufacturer FROM Win32_Processor").FirstOrDefault();
+        return new BoardData(Str(board?["Manufacturer"]).Trim(), Str(board?["Product"]).Trim(),
+            Str(system?["Manufacturer"]).Trim(), Str(system?["Model"]).Trim(), Str(cpu?["Manufacturer"]).Trim());
     }
 
     // ---------- Carte graphique ----------
@@ -361,44 +357,6 @@ public sealed class WindowsDiagnostics(
     private static long Long(object? v) => v is null ? 0 : Convert.ToInt64(v);
 
     // ---------- API Windows (documentées) ----------
-
-    private const int EnumCurrentSettings = -1;
-    private const int AttachedToDesktop = 0x1;
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct DisplayDevice
-    {
-        public int Size;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string DeviceName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string DeviceString;
-        public int StateFlags;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string DeviceId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)] public string DeviceKey;
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct DevMode
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string DeviceName;
-        public short SpecVersion, DriverVersion, Size, DriverExtra;
-        public int Fields;
-        public int PositionX, PositionY, DisplayOrientation, DisplayFixedOutput;
-        public short Color, Duplex, YResolution, TTOption, Collate;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string FormName;
-        public short LogPixels;
-        public int BitsPerPel, PelsWidth, PelsHeight, DisplayFlags, DisplayFrequency;
-        public int IcmMethod, IcmIntent, MediaType, DitherType, Reserved1, Reserved2, PanningWidth, PanningHeight;
-    }
-
-    private static DevMode NewDevMode() => new() { Size = (short)Marshal.SizeOf<DevMode>() };
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool EnumDisplayDevices(string? device, uint index, ref DisplayDevice displayDevice, uint flags);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DevMode devMode);
 
     [DllImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

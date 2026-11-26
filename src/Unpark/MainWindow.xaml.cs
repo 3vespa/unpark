@@ -13,6 +13,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         // Barre de titre sombre (Windows 10 20H1+ et Windows 11), sans effet ailleurs.
         SourceInitialized += (_, _) => DarkTitleBar.Apply(this);
+        // Recherche de mise à jour une fois la fenêtre affichée, en arrière-plan.
+        ContentRendered += (_, _) => _ = ((MainViewModel)DataContext).Update.StartAsync();
     }
 
     protected override void OnClosing(CancelEventArgs e)

@@ -16,7 +16,7 @@ public static class DiagnosticAnalyzer
     {
         var sections = new List<DiagSection>
         {
-            new("Mémoire (RAM)", Ram(d.Ram)),
+            new("Mémoire (RAM)", Ram(d.Ram, d.Board, d.Windows?.IsLaptop == true)),
             new("Écran", Displays(d.Displays)),
             new("Carte graphique", Gpus(d.Gpus, d.Windows, d.Now)),
             new("Stabilité (30 derniers jours)", Stability(d.Stability)),
@@ -30,7 +30,7 @@ public static class DiagnosticAnalyzer
 
     // ---------- RAM ----------
 
-    public static IReadOnlyList<DiagCheck> Ram(RamData? ram)
+    public static IReadOnlyList<DiagCheck> Ram(RamData? ram, BoardData? board = null, bool isLaptop = false)
     {
         if (ram is null || ram.Modules.Count == 0 && ram.TotalBytes == 0)
             return [new("Mémoire", DiagStatus.Info, "Illisible", "Windows n'a pas donné d'informations sur la mémoire.")];
@@ -54,12 +54,12 @@ public static class DiagnosticAnalyzer
         }
 
         var modules = ram.Modules.Where(m => m.CapacityBytes > 0).ToList();
-        if (modules.Count > 0) checks.Add(RamSpeed(modules));
+        if (modules.Count > 0) checks.Add(RamSpeed(modules, board, isLaptop));
         if (modules.Count > 0) checks.Add(DualChannel(modules));
         return checks;
     }
 
-    private static DiagCheck RamSpeed(IReadOnlyList<RamModule> modules)
+    private static DiagCheck RamSpeed(IReadOnlyList<RamModule> modules, BoardData? board, bool isLaptop)
     {
         var configured = modules.Where(m => m.ConfiguredMts > 0).Select(m => m.ConfiguredMts).DefaultIfEmpty(0).Min();
         var reported = modules.Select(m => m.RatedMts).DefaultIfEmpty(0).Max();
@@ -70,15 +70,16 @@ public static class DiagnosticAnalyzer
 
         if (configured == 0)
             return new("Vitesse (XMP / EXPO)", DiagStatus.Info, value, "Windows n'indique pas la vitesse actuelle de la mémoire.");
+        var guide = new BiosGuideAction(BiosGuides.For(board, ddr, isLaptop));
         if (rated > configured + 100)
-            return new("Vitesse (XMP / EXPO)", DiagStatus.Orange, value,
+            return new DiagCheck("Vitesse (XMP / EXPO)", DiagStatus.Orange, value,
                 $"Tes barrettes sont prévues pour {rated} MT/s mais tournent à {configured}. Active le profil XMP (Intel) ou EXPO (AMD) dans le BIOS : " +
-                "souvent plusieurs % de FPS et de meilleurs 1 % low dans les jeux limités par le processeur.");
+                "souvent plusieurs % de FPS et de meilleurs 1 % low dans les jeux limités par le processeur. Windows ne peut pas le faire à ta place.") { Action = guide };
         var jedecMax = ddr == "DDR5" ? 4800 : ddr == "DDR4" ? 2666 : 0;
         if (jedecMax > 0 && configured <= jedecMax)
-            return new("Vitesse (XMP / EXPO)", DiagStatus.Orange, value,
+            return new DiagCheck("Vitesse (XMP / EXPO)", DiagStatus.Orange, value,
                 $"{configured} MT/s est la vitesse de base du {ddr} : le profil XMP / EXPO est probablement désactivé. Si tes barrettes sont prévues plus " +
-                "rapides (regarde leur étiquette ou leur fiche), active XMP / EXPO dans le BIOS.");
+                "rapides (regarde leur étiquette ou leur fiche), active XMP / EXPO dans le BIOS.") { Action = guide };
         return new("Vitesse (XMP / EXPO)", DiagStatus.Green, value, "La mémoire tourne à sa vitesse prévue (XMP / EXPO actif ou inutile).");
     }
 
@@ -104,11 +105,18 @@ public static class DiagnosticAnalyzer
         {
             var title = displays.Count > 1 ? $"Fréquence ({s.Name})" : "Fréquence de l'écran";
             var value = $"{s.CurrentHz} Hz (max {s.MaxHz} Hz) en {s.Width}×{s.Height}";
-            return s.MaxHz > s.CurrentHz + 1
-                ? new DiagCheck(title, DiagStatus.Red, value,
+            if (s.MaxHz <= s.CurrentHz + 1) return new DiagCheck(title, DiagStatus.Green, value, "L'écran est réglé à sa fréquence maximale.");
+            if (s.DeviceName.Length == 0)
+                return new DiagCheck(title, DiagStatus.Red, value,
                     $"L'écran est réglé à {s.CurrentHz} Hz alors qu'il supporte {s.MaxHz} Hz : l'erreur la plus courante ! " +
-                    "Paramètres → Affichage → Affichage avancé → Choisir une fréquence d'actualisation.", DiagFix.DisplaySettings)
-                : new DiagCheck(title, DiagStatus.Green, value, "L'écran est réglé à sa fréquence maximale.");
+                    "Paramètres → Affichage → Affichage avancé → Choisir une fréquence d'actualisation.", DiagFix.DisplaySettings);
+            return new DiagCheck(title, DiagStatus.Red, value,
+                $"L'écran est réglé à {s.CurrentHz} Hz alors qu'il supporte {s.MaxHz} Hz : l'erreur la plus courante ! " +
+                $"« Passer à {s.MaxHz} Hz » le change tout de suite. Comme dans Windows, tu devras confirmer : sans réponse en 15 secondes " +
+                $"(par exemple si l'écran devient noir), il revient tout seul à {s.CurrentHz} Hz.")
+            {
+                Action = new RefreshRateAction(s.DeviceName, s.Name, s.Width, s.Height, s.CurrentHz, s.MaxHz),
+            };
         }).ToList();
     }
 
@@ -124,11 +132,19 @@ public static class DiagnosticAnalyzer
             {
                 var months = (now - date).TotalDays / 30.4;
                 var value = $"{g.Name} — pilote {g.DriverVersion} du {date:dd/MM/yyyy}";
+                var page = DriverPages.For(g.Name);
+                var where = page is { } p
+                    ? $" « Mettre à jour » ouvre la page officielle {p.Vendor} : le téléchargement et l'installation se font depuis leur site, Unpark n'installe rien."
+                    : "";
+                var laptop = windows?.IsLaptop == true && DiagnosticParsers.IsIntegratedGpu(g.Name)
+                    ? " Sur un portable, le site du fabricant du PC peut proposer un pilote adapté à ton modèle."
+                    : "";
+                var action = page is { } pg ? new DriverPageAction(pg.Vendor, pg.Url) : null;
                 checks.Add(months > 12
-                    ? new(prefix + "Pilote graphique", DiagStatus.Red, value, "Pilote de plus d'un an : installe le dernier depuis le site du fabricant (NVIDIA App, AMD Adrenalin, Intel). Gains et corrections pour les jeux récents.")
+                    ? new DiagCheck(prefix + "Pilote graphique", DiagStatus.Red, value, "Pilote de plus d'un an : installe le dernier depuis le site du fabricant (NVIDIA App, AMD Adrenalin, Intel). Gains et corrections pour les jeux récents." + where + laptop) { Action = action }
                     : months > 6
-                        ? new(prefix + "Pilote graphique", DiagStatus.Orange, value, "Pilote de plus de 6 mois : une mise à jour peut améliorer les jeux récents.")
-                        : new(prefix + "Pilote graphique", DiagStatus.Green, value, "Pilote récent."));
+                        ? new DiagCheck(prefix + "Pilote graphique", DiagStatus.Orange, value, "Pilote de plus de 6 mois : une mise à jour peut améliorer les jeux récents." + where + laptop) { Action = action }
+                        : new DiagCheck(prefix + "Pilote graphique", DiagStatus.Green, value, "Pilote récent."));
             }
             else
             {

@@ -31,6 +31,20 @@ public partial class App : Application
             return;
         }
 
+        // Mise à jour téléchargée lors d'une session précédente : installée AVANT d'afficher la fenêtre.
+        bool relaunched;
+        try { relaunched = UpdateFlow.RunAtStartup(e.Args); }
+        catch (Exception ex)
+        {
+            AppServices.Current.Log.Error("Mise à jour au lancement : erreur inattendue, version actuelle conservée", ex);
+            relaunched = false;
+        }
+        if (relaunched)
+        {
+            Shutdown();
+            return;
+        }
+
         new MainWindow().Show();
     }
 

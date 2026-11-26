@@ -63,4 +63,17 @@ public class DialogTests
         var safety = File.ReadAllText(Path.Combine(SourceDir(), "Services", "SafetyFlow.cs"));
         Assert.Contains("Dialogs.Confirm(w.Warning, danger: true)", safety);
     }
+
+    [Fact]
+    public void Garder_cette_frequence_tout_sauf_Garder_revient_en_arriere()
+    {
+        var b = DialogLayout.KeepOrRevert(60);
+        Assert.Equal(["Garder", "Revenir à 60 Hz"], b.Select(x => x.Label));
+        Assert.Equal(DialogChoice.No, b.Single(x => x.IsPrimary).Choice); // Entrée
+        Assert.Equal(DialogChoice.No, b.Single(x => x.IsCancel).Choice);  // Échap, fermeture
+        Assert.Equal(15, DialogLayout.KeepDisplaySeconds);
+        Assert.Equal("Revenir à 60 Hz (15)", DialogLayout.CountdownLabel("Revenir à 60 Hz", 15));
+        Assert.Contains("dans 1 seconde.", DialogLayout.KeepDisplayMessage("Écran 1", 144, 60, 1));
+        Assert.Contains("dans 15 secondes.", DialogLayout.KeepDisplayMessage("Écran 1", 144, 60, 15));
+    }
 }

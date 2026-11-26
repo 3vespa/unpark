@@ -15,6 +15,8 @@
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
     <!-- Lecture de l'Observateur d'événements (diagnostic : WHEA, écrans bleus, Kernel-Power 41). -->
     <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.1" />
+    <!-- Vérification des signatures Ed25519 des mises à jour (.NET 8 ne sait pas le faire seul). Code 100 % managé, licence MIT. -->
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Unpark.Tests" />
